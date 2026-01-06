@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace等于mapper接口类的全限定名,这样实现对应 -->
+<mapper namespace="com.demo.mapper.UserMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO `user` (username, `password`, email, nickname)
+        VALUES (#{username}, #{password}, #{email}, #{username});
+    </insert>
+
+    <select id="selectByUsername">
+        SELECT id, username, password, email, nickname
+        FROM `user`
+        WHERE username = #{username};
+    </select>
+
+    <select id="selectById">
+        SELECT id, username, password, email, nickname
+        FROM  `user`
+        WHERE id = #{id};
+    </select>
+
+    <update id="updatePassword">
+        UPDATE `user`
+        SET password = #{newPassword}
+        WHERE id = #{id};
+    </update>
+
+</mapper>

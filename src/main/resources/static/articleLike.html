@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Article Like Test</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; padding: 40px; background: #f4f4f9; }
+        .card { background: white; padding: 24px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
+        h2 { margin-top: 0; color: #333; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
+        input { padding: 10px; width: 100%; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .btn-group { display: flex; gap: 10px; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; }
+        .btn-like { background: #1677ff; color: white; }
+        .btn-unlike { background: #ff4d4f; color: white; }
+        .btn-stress { background: #722ed1; color: white; }
+        button:hover { opacity: 0.8; }
+        .log { margin-top: 20px; height: 250px; overflow-y: auto; border: 1px solid #eee; padding: 10px; font-size: 13px; background: #fafafa; border-radius: 4px; font-family: monospace; }
+        .log-item { margin-bottom: 4px; border-bottom: 1px solid #f0f0f0; padding-bottom: 2px; }
+        .status-200 { color: #52c41a; }
+        .status-err { color: #f5222d; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>文章点赞测试</h2>
+
+    <div class="input-group">
+        <label>Article ID</label>
+        <input type="number" id="articleId" value="1">
+    </div>
+
+    <div class="btn-group">
+        <button class="btn-like" onclick="sendLike(true)">👍 点赞</button>
+        <button class="btn-unlike" onclick="sendLike(false)">👎 取消</button>
+        <button class="btn-stress" onclick="stressTest()">🔥 连点测试</button>
+    </div>
+
+    <div class="log" id="log">
+        <div class="log-item">系统就绪，等待操作...</div>
+    </div>
+</div>
+
+<script>
+    // 1. 确保基础 URL 正确（检查后端 Controller 的 @RequestMapping）
+    const BASE_URL = "http://localhost:8080/article/like";
+
+    // 2. 这里的 Key 必须和你在登录页面存的时候一致
+    const TOKEN_STORAGE_NAME = "Authorization";
+
+    function log(msg, isError = false) {
+        const div = document.getElementById("log");
+        const time = new Date().toLocaleTimeString();
+        const className = isError ? 'status-err' : 'status-200';
+        div.innerHTML += `<div class="log-item">[${time}] <span class="${className}">${msg}</span></div>`;
+        div.scrollTop = div.scrollHeight;
+    }
+
+    function getHeaders() {
+        const token = localStorage.getItem(TOKEN_STORAGE_NAME);
+        if (!token) {
+            log("警告：未在 LocalStorage 中找到 Token！", true);
+        }
+        return {
+            "Content-Type": "application/json",
+            // 关键：Header 的 Key 必须是 Authorization，值通常需要加 Bearer
+            "Authorization": token ? (token.startsWith("Bearer ") ? token : "Bearer " + token) : ""
+        };
+    }
+
+    async function sendLike(isLike) {
+        const id = document.getElementById("articleId").value;
+        const url = isLike ? `${BASE_URL}/${id}` : `${BASE_URL}/not/${id}`;
+
+        try {
+            const res = await fetch(url, {
+                method: "POST",
+                headers: getHeaders()
+            });
+
+            if (res.ok) {
+                log(`${isLike ? '点赞' : '取消'}成功 | 状态码: ${res.status}`);
+            } else {
+                log(`${isLike ? '点赞' : '取消'}失败 | 状态码: ${res.status}`, true);
+                if(res.status === 401) log("原因：Token 无效或已过期", true);
+            }
+        } catch (err) {
+            log("网络错误：无法连接到后端服务器", true);
+        }
+    }
+
+    async function stressTest() {
+        const id = document.getElementById("articleId").value;
+        log("🚀 开始并发连点测试 (50次)...", false);
+
+        const tasks = [];
+        for (let i = 0; i < 50; i++) {
+            const isLike = Math.random() > 0.5;
+            const url = isLike ? `${BASE_URL}/${id}` : `${BASE_URL}/not/${id}`;
+
+            // 使用 push 收集所有 promise 以便观察并发效果
+            tasks.push(
+                fetch(url, { method: "POST", headers: getHeaders() })
+                    .then(res => log(`并发请求 ${i+1}: ${res.status} ${res.ok ? '✅' : '❌'}`))
+                    .catch(() => log(`并发请求 ${i+1}: 失败`, true))
+            );
+        }
+        await Promise.all(tasks);
+        log("🏁 测试完成");
+    }
+</script>
+
+</body>
+</html>

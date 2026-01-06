@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace等于mapper接口类的全限定名,这样实现对应 -->
+<mapper namespace="com.demo.mapper.ArticleMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO article (author_id, title, content)
+        VALUES (#{authorId}, #{title}, #{content});
+    </insert>
+
+    <update id="update">
+        UPDATE article
+        SET title = #{title}, content = #{content}
+        WHERE id = #{id};
+    </update>
+
+    <update id="delete">
+        UPDATE article
+        SET status = 2
+        WHERE id = #{id};
+    </update>
+
+    <select id="selectById" resultType="article">
+        SELECT *
+        FROM article
+        WHERE id = #{id};
+    </select>
+
+    <select id="getCommentCount" resultType="int">
+        SELECT COUNT(1)
+        FROM comment
+        WHERE article_id = #{id};
+    </select>
+
+    <select id="getLikeCount" resultType="int">
+        SELECT COUNT(1)
+        FROM article_like
+        WHERE article_id = #{id};
+    </select>
+
+    <select id="getAuthorName" resultType="string">
+        SELECT nickname
+        FROM user
+        WHERE id = #{id};
+    </select>
+
+</mapper>

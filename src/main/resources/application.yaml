@@ -1,0 +1,30 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    username: root
+    password: 123456
+    url: jdbc:mysql://localhost:3306/tc?characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      password: 123456
+
+elasticsearch:
+  apiKey: Y0FubTU1b0JKdG1LTXZJMjQtRW86Um9vR0k5ald5ZERkNGZORVdPcHpWdw==
+  uri: https://locahost:9200
+  host: localhost
+  port: 9200
+  scheme: https
+
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  type-aliases-package: com.demo.pojo
+
