@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>发布新文章 - MyProject</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/article.css"> <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .editor-container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        .editor-card { background: white; border-radius: 24px; padding: 40px; box-shadow: var(--shadow); }
+        .editor-header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+
+        .title-input {
+            width: 100%; border: none; font-size: 32px; font-weight: 800;
+            outline: none; margin-bottom: 20px; color: var(--text-title);
+        }
+        .title-input::placeholder { color: #E5E5EA; }
+
+        .content-textarea {
+            width: 100%; min-height: 400px; border: none; outline: none;
+            font-size: 16px; line-height: 1.8; color: var(--text-body);
+            resize: vertical;
+        }
+
+        .editor-footer {
+            margin-top: 30px; padding-top: 20px;
+            border-top: 1px solid var(--border);
+            display: flex; justify-content: flex-end; gap: 12px;
+        }
+        .publish-btn { padding: 12px 32px; border-radius: 12px; font-weight: 600; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="nav">
+        <div class="nav-left">
+            <a href="index.html" class="logo">MyProject</a>
+            <nav class="main-nav">
+                <a href="index.html" class="active">首页</a>
+                <a href="article.html">文章列表</a>
+            </nav>
+        </div>
+
+        <div class="nav-right">
+            <a href="javascript:void(0)" class="nav-publish-btn" id="publishBtn">
+                <i data-lucide="pen-line"></i> <span>写文章</span>
+            </a>
+
+            <a href="login.html" id="loginLink" class="btn-primary" style="padding: 10px 24px; border-radius: 12px;">登录 / 注册</a>
+
+            <div class="avatar-wrapper" id="avatarWrapper" style="display: none; position: relative; padding: 5px 0;">
+                <div class="avatar-container">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="avatar" id="userAvatar">
+                </div>
+
+                <div class="dropdown">
+                    <div class="dropdown-header">账号管理</div>
+                    <div style="padding: 0 12px 10px; font-weight: 700; color: var(--text-title); font-size: 15px;">
+                        <span id="navNickname">用户名</span>
+                    </div>
+                    <hr style="border:0; border-top:1px solid #f0f0f0; margin:5px 10px 10px;">
+
+                    <a href="profile.html"><i data-lucide="user"></i> 个人中心</a>
+                    <a href="myArticles.html"><i data-lucide="layout-list"></i> 我的文章</a>
+
+                    <a href="javascript:void(0)" id="logoutBtn" style="color: #FF4D4F; margin-top: 5px;">
+                        <i data-lucide="log-out"></i> 退出登录
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="editor-container">
+    <div class="editor-card">
+        <div class="editor-header">
+            <span style="color: var(--text-muted); font-size: 14px;">创作新内容</span>
+            <button class="btn-ghost" onclick="history.back()">取消</button>
+        </div>
+
+        <input type="text" id="postTitle" class="title-input" placeholder="请输入标题..." maxlength="100">
+
+        <textarea id="postContent" class="content-textarea" placeholder="开始你的创作..."></textarea>
+
+        <div class="editor-footer">
+            <button class="btn-primary publish-btn" id="submitBtn">
+                <i data-lucide="send" size="18"></i> 发布文章
+            </button>
+        </div>
+    </div>
+</main>
+
+<script src="js/add-article.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

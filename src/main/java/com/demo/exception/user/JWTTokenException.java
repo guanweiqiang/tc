@@ -10,6 +10,6 @@ public class JWTTokenException extends GlobalException {
     }
 
     public JWTTokenException(String message) {
-        super(ResponseCode.JWT_TOKEN_ERROR.getStatusCode(), message);
+        super(ResponseCode.JWT_TOKEN_ERROR.getCode(), message);
     }
 }

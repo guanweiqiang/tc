@@ -1,0 +1,239 @@
+/* =========================================
+   1. 全局变量与基础重置
+   ========================================= */
+:root {
+    --primary: #0066FF;
+    --primary-hover: #4096ff;
+    --primary-light: #E6F0FF;
+    --bg-main: #F2F4F7;
+    --card-bg: #FFFFFF;
+    --text-title: #1D1D1F;
+    --text-body: #48484A;
+    --text-sec: #646a73;
+    --text-muted: #86868B;
+    --border: #E5E5EA;
+    --radius: 12px;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* 核心修复：定义缺失的状态色 */
+    --error: #FF3B30;   /* 退出登录红色 */
+    --success: #34C759; /* 成功绿色 */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-body);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* 2. 头像容器 - 增加精致的边框与阴影 */
+.avatar-container {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.avatar-wrapper:hover .avatar-container {
+    border-color: var(--primary-light);
+    transform: scale(1.05);
+}
+
+
+
+/* =========================================
+   2. 导航栏 (修复头像与下拉逻辑)
+   ========================================= */
+header {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    height: 60px;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 1000; /* 提高层级 */
+}
+
+.nav {
+    max-width: 1100px; margin: 0 auto; height: 100%;
+    display: flex; justify-content: space-between; align-items: center; padding: 0 24px;
+}
+
+/* 右侧导航容器 */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* 原本可能是 16px，增加到 20px */
+}
+
+/* 1. 写文章按钮 - 采用轻量化设计，不抢登录按钮的风头 */
+.nav-publish-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    color: var(--primary);
+    background: var(--primary-light);
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid transparent;
+}
+
+.nav-publish-btn:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 102, 255, 0.15);
+}
+
+.nav-publish-btn i {
+    width: 18px;
+    height: 18px;
+}
+
+.nav-left { display: flex; align-items: center; gap: 20px; }
+.logo { font-weight: 700; font-size: 20px; color: var(--primary); text-decoration: none; }
+.main-nav { margin-left: 20px; display: flex; gap: 24px; }
+.main-nav a { text-decoration: none; color: var(--text-body); font-size: 14px; font-weight: 500; transition: 0.2s; }
+.main-nav a:hover, .main-nav a.active { color: var(--primary); }
+
+
+
+.avatar-wrapper {
+    position: relative;
+    cursor: pointer;
+    padding: 0; /* 移除 padding，由 height 控制 */
+    display: flex;
+    align-items: center;
+    height: 60px; /* 与 header 同高 */
+}
+
+.avatar-container {
+    /* 将原本的 36px 增加到 42px 或 44px */
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 2px solid white; /* 增加一点白边，在大头像下更精致 */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.2s ease;
+}
+
+.avatar-container:hover {
+    transform: scale(1.05); /* 悬停时稍微放大，增加交互感 */
+}
+
+.avatar-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+.avatar { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.dropdown {
+    position: absolute;
+    right: 0;
+    top: 54px;
+    width: 200px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px); /* 毛玻璃效果 */
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    padding: 10px;
+    display: none;
+    z-index: 1000;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 悬停触发显示 */
+.avatar-wrapper:hover .dropdown { display: block; }
+
+.dropdown-header { padding: 8px 12px; font-weight: 600; color: var(--text-title); font-size: 13px; }
+.dropdown a {
+    display: flex; align-items: center; gap: 8px; padding: 10px 12px;
+    text-decoration: none; color: var(--text-body); font-size: 13px; border-radius: 8px;
+}
+.dropdown a:hover { background: var(--bg-main); color: var(--primary); }
+
+/* =========================================
+   3. 布局修复 (区分文章列表与个人中心)
+   ========================================= */
+/* --- 基础容器（全站通用，仅限宽度和间距） --- */
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* --- 侧边栏布局（专门给个人中心 profile.html 使用） --- */
+.profile-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 32px;
+    margin-top: 40px;
+}
+
+/* --- 居中布局（专门给文章列表 article.html 使用） --- */
+.feed-layout {
+    max-width: 800px; /* 让内容更聚焦，像知乎一样 */
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 确保内部元素水平居中 */
+}
+
+/* 为文章列表页准备的单列布局 */
+.container-feed {
+    max-width: 850px; margin: 40px auto; padding: 0 20px;
+}
+
+/* =========================================
+   4. 按钮与输入框 (保持一致性)
+   ========================================= */
+.btn-primary {
+    background: var(--primary); color: white; border: none;
+    padding: 10px 20px; border-radius: 10px; font-weight: 600;
+    cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 8px;
+}
+.btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+
+
+@media (max-width: 768px) {
+    .nav {
+        padding: 0 16px;
+    }
+
+    .main-nav {
+        display: none; /* 手机端通常隐藏文字菜单，或者改用汉堡菜单 */
+    }
+
+    .logo {
+        font-size: 18px;
+    }
+
+    .nav-publish-btn span {
+        display: none; /* 手机端只显示笔图标，隐藏“写文章”文字 */
+    }
+
+    .nav-publish-btn {
+        padding: 8px 12px;
+    }
+}
+

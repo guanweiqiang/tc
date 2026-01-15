@@ -2,53 +2,36 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>登录</title>
+    <title>用户登录</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-        }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .login-container { width: 380px; padding: 35px 30px; background: #fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.1); }
+        .login-container h2 { text-align: center; margin-bottom: 25px; color: #1f1f1f; font-size: 22px; }
 
-        .login-container {
-            width: 320px;
-            margin: 120px auto;
-            padding: 30px;
-            background: #fff;
-            border-radius: 6px;
-            box-shadow: 0 2px 8px rgba(0,0,0,.1);
-        }
+        /* 三 Tab 切换样式 */
+        .login-tabs { display: flex; justify-content: space-between; margin-bottom: 25px; border-bottom: 1px solid #f0f0f0; }
+        .tab-item { padding: 10px 5px; cursor: pointer; color: #595959; font-size: 13px; border-bottom: 2px solid transparent; transition: all 0.3s; flex: 1; text-align: center; }
+        .tab-item.active { color: #1677ff; border-bottom: 2px solid #1677ff; font-weight: 600; }
 
-        .login-container h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 14px; color: #262626; }
+        .login-container input { width: 100%; padding: 10px 12px; box-sizing: border-box; border: 1px solid #d9d9d9; border-radius: 6px; outline: none; }
+        .login-container input:focus { border-color: #40a9ff; box-shadow: 0 0 0 2px rgba(24,144,255,0.1); }
 
-        .login-container input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-        }
+        /* 验证码特有布局 */
+        .code-group { display: flex; gap: 8px; }
+        .btn-send { width: 110px; background: #f5f5f5; border: 1px solid #d9d9d9; border-radius: 6px; cursor: pointer; font-size: 12px; color: #666; transition: all 0.3s; }
+        .btn-send:disabled { cursor: not-allowed; color: #bcbcbc; }
 
-        .login-container button {
-            width: 100%;
-            padding: 10px;
-            background: #409eff;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-        }
+        .btn-login { width: 100%; padding: 12px; background: #1677ff; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        .btn-login:hover { background: #40a9ff; }
 
-        .login-container button:hover {
-            background: #337ecc;
-        }
+        .login-form { display: none; }
+        .login-form.active { display: block; }
 
-        .error {
-            color: red;
-            font-size: 14px;
-            text-align: center;
-            margin-top: 10px;
-        }
+        .error { color: #ff4d4f; font-size: 13px; text-align: center; margin-top: 15px; min-height: 1.5em; }
+        .footer-links { text-align: center; margin-top: 20px; font-size: 14px; }
+        .footer-links a { color: #1677ff; text-decoration: none; }
     </style>
 </head>
 <body>
@@ -56,62 +39,170 @@
 <div class="login-container">
     <h2>用户登录</h2>
 
-    <input type="text" id="username" placeholder="用户名">
-    <input type="password" id="password" placeholder="密码">
+    <div class="login-tabs">
+        <div id="tabUser" class="tab-item active" onclick="switchTab('user')">用户名密码</div>
+        <div id="tabEmailPwd" class="tab-item" onclick="switchTab('emailPwd')">邮箱密码</div>
+        <div id="tabEmailCode" class="tab-item" onclick="switchTab('emailCode')">邮箱验证码</div>
+    </div>
 
-    <button onclick="login()">登录</button>
-    <div style="text-align:center;margin-top:12px;">
+    <div id="userForm" class="login-form active">
+        <div class="form-group">
+            <input type="text" id="username" placeholder="请输入用户名">
+        </div>
+        <div class="form-group">
+            <input type="password" id="userPwd" placeholder="请输入密码">
+        </div>
+        <button class="btn-login" onclick="login('user')">登录</button>
+    </div>
+
+    <div id="emailPwdForm" class="login-form">
+        <div class="form-group">
+            <input type="email" id="emailP" placeholder="注册邮箱">
+        </div>
+        <div class="form-group">
+            <input type="password" id="emailPwd" placeholder="请输入密码">
+        </div>
+        <button class="btn-login" onclick="login('emailPwd')">登录</button>
+    </div>
+
+    <div id="emailCodeForm" class="login-form">
+        <div class="form-group">
+            <input type="email" id="emailC" placeholder="邮箱">
+        </div>
+        <div class="form-group code-group">
+            <input type="text" id="verifyCode" placeholder="验证码">
+            <button id="sendBtn" class="btn-send" onclick="sendCode()">获取验证码</button>
+        </div>
+        <button class="btn-login" onclick="login('emailCode')">登录</button>
+    </div>
+
+    <div class="footer-links">
         <a href="register.html">没有账号？去注册</a>
     </div>
     <div class="error" id="errorMsg"></div>
 </div>
 
 <script>
-
     const TOKEN_KEY = "Authorization";
-    function login() {
-        const username = document.getElementById("username").value.trim();
-        const password = document.getElementById("password").value.trim();
+    const API_BASE = "http://192.168.0.101:8080/auth";
+    let countdown = 60;
+
+    function switchTab(type) {
+        document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.login-form').forEach(el => el.classList.remove('active'));
+
+        document.getElementById('tab' + type.charAt(0).toUpperCase() + type.slice(1)).classList.add('active');
+        document.getElementById(type + 'Form').classList.add('active');
+        document.getElementById('errorMsg').innerText = "";
+    }
+
+    // --- 发送验证码逻辑 ---
+    // --- 发送验证码逻辑 ---
+    async function sendCode() {
+        const email = document.getElementById("emailC").value.trim();
         const errorMsg = document.getElementById("errorMsg");
 
-        errorMsg.innerText = "";
-
-        if (!username || !password) {
-            errorMsg.innerText = "用户名和密码不能为空";
+        // 1. 基础校验
+        if (!/^\S+@\S+\.\S+$/.test(email)) {
+            showError("请输入有效的邮箱");
             return;
         }
 
-        fetch("http://localhost:8080/user/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                username: username,
-                password: password
-            })
-        })
-            .then(res => res.json())
-            .then(res => {
-                if (res.isSuccess === true) {
+        // 2. 清除错误信息并禁用按钮
+        errorMsg.innerText = "";
+        const btn = document.getElementById("sendBtn");
 
-                    const token = res.data.token;
-                    if (!token) {
-                        alert("登录异常：未返回 token");
-                        return;
-                    }
-                    localStorage.setItem(TOKEN_KEY, "Bearer " + token);
+        try {
+            // 3. 修改后的请求地址，增加了 purpose 参数
+            // 如果你的后端接收的是路径参数或 Body，请根据实际情况调整，这里演示的是常用的 Query 参数
+            const response = await fetch(`${API_BASE}/sendVerificationCode?email=${email}&purpose=LOGIN`);
 
-                    window.location.href = "/index.html";
-                } else {
-                    errorMsg.innerText = res.message;
-                }
-            })
-            .catch(() => {
-                errorMsg.innerText = "服务器异常，请稍后再试";
-            });
+            const data = await response.json();
+
+            if (data.isSuccess) {
+                // 发送成功，开始倒计时
+                startCountdown();
+            } else {
+                // 显示后端返回的具体错误（如：用户不存在、请求频繁等）
+                showError(data.message || "发送失败，请重试");
+            }
+        } catch (e) {
+            console.error("发送验证码异常:", e);
+            showError("网络异常，请稍后再试");
+        }
     }
-</script>
 
+    function startCountdown() {
+        const btn = document.getElementById("sendBtn");
+        btn.disabled = true;
+        let timer = setInterval(() => {
+            if (countdown <= 0) {
+                clearInterval(timer);
+                btn.innerText = "获取验证码";
+                btn.disabled = false;
+                countdown = 60;
+            } else {
+                btn.innerText = `${countdown}s`;
+                countdown--;
+            }
+        }, 1000);
+    }
+
+    // --- 登录总控逻辑 ---
+    async function login(type) {
+        let url = "";
+        let payload = {};
+
+        if (type === 'user') {
+            url = `${API_BASE}/login`;
+            payload = {
+                username: document.getElementById("username").value.trim(),
+                password: document.getElementById("userPwd").value.trim()
+            };
+        } else if (type === 'emailPwd') {
+            url = `${API_BASE}/loginByEmailPwd`; // 对应你的邮箱+密码接口
+            payload = {
+                email: document.getElementById("emailP").value.trim(),
+                password: document.getElementById("emailPwd").value.trim()
+            };
+        } else if (type === 'emailCode') {
+            url = `${API_BASE}/loginByEmailCode`; // 对应你的邮箱+验证码接口
+            payload = {
+                email: document.getElementById("emailC").value.trim(),
+                code: document.getElementById("verifyCode").value.trim()
+            };
+        }
+
+        // 简单校验
+        if (Object.values(payload).some(v => !v)) {
+            showError("请填写完整信息");
+            return;
+        }
+
+        submitForm(url, payload);
+    }
+
+    async function submitForm(url, data) {
+        try {
+            const res = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if (result.isSuccess) {
+                localStorage.setItem(TOKEN_KEY, "Bearer " + result.data.token);
+                window.location.href = "/index.html";
+            } else {
+                showError(result.message);
+            }
+        } catch (e) {
+            showError("系统繁忙", e);
+            console.log(e)
+        }
+    }
+
+    function showError(msg) { document.getElementById("errorMsg").innerText = msg; }
+</script>
 </body>
 </html>

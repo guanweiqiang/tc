@@ -1,6 +1,11 @@
 package com.demo.service;
 
 import com.demo.pojo.Article;
+import com.demo.pojo.DTO.ArticleSearchListDTO;
+import com.demo.pojo.VO.ArticleDetailVO;
+import com.demo.pojo.VO.ArticleListVO;
+
+import java.util.List;
 
 public interface ArticleService {
 
@@ -10,11 +15,11 @@ public interface ArticleService {
 
     boolean delete(Long id);
 
-    Article searchDetail(Long id);
+    List<ArticleListVO> searchList(ArticleSearchListDTO dto);
+
+    ArticleDetailVO searchDetail(Long id);
 
     Integer getCommentCount(Long id);
-
-    Integer getLikeCount(Long id);
 
     String getAuthorName(Long id);
 }

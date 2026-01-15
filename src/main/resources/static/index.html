@@ -2,180 +2,31 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>MyProject</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <title>MyProject - 首页</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-            Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: #f7f8fa;
-            color: #222;
-            line-height: 1.6;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        /* ===== Header ===== */
-        header {
-            background: #ffffff;
-            border-bottom: 1px solid #e5e6eb;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .nav {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 24px; /* 移除垂直内边距，交给 a 标签或 wrapper */
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 60px; /* 固定导航栏高度 */
-        }
-
-        .logo {
-            font-size: 20px;
-            font-weight: 600;
-            color: #1677ff;
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-            height: 100%;
-        }
-
-        .nav-right > a {
-            font-size: 14px;
-            color: #555;
-            line-height: 60px; /* 让链接撑满高度 */
-        }
-
-        .nav-right a:hover {
-            color: #1677ff;
-        }
-
-        /* ===== 用户区域（关键修复点） ===== */
-        .user-area {
-            position: relative;
-            height: 100%;
-            display: flex;
-            align-items: center;
-        }
-
-        .avatar-wrapper {
-            display: none; /* 由 JS 控制显示为 flex */
-            align-items: center;
-            height: 100%;
-            cursor: pointer;
-            padding: 0 4px;
-        }
-
-        .avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 1px solid #e5e6eb;
-        }
-
-        /* 鼠标悬浮在 user-area 时显示 dropdown */
-        .user-area:hover .dropdown {
-            display: block;
-        }
-
-        .dropdown {
-            position: absolute;
-            right: 0;
-            top: 55px; /* 紧贴导航栏底部，不留缝隙 */
-            background: #fff;
-            border: 1px solid #e5e6eb;
-            border-radius: 6px;
-            min-width: 140px;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-            display: none; /* 默认隐藏 */
-            z-index: 1001;
-            padding: 4px 0;
-        }
-
-        /* 增加一个透明的伪元素填补缝隙，防止鼠标滑出 */
-        .dropdown::before {
-            content: "";
-            position: absolute;
-            top: -15px;
-            left: 0;
-            right: 0;
-            height: 15px;
-            background: transparent;
-        }
-
-        .dropdown a {
-            display: block;
-            padding: 10px 16px;
-            font-size: 14px;
-            color: #333;
-            line-height: 1.2;
-        }
-
-        .dropdown a:hover {
-            background-color: #f5f6f7;
-            color: #1677ff;
-        }
-
-        /* ===== Hero & Content ===== */
-        .hero {
-            background: linear-gradient(135deg, #1677ff, #4096ff);
-            color: #fff;
-            padding: 80px 24px;
-        }
-
-        .hero-content {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        .hero h1 {
-            font-size: 40px;
-            margin-bottom: 16px;
-        }
-
-        .section {
-            max-width: 1100px;
-            margin: 48px auto;
-            padding: 0 24px;
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 24px;
-        }
-
-        .feature-card {
-            background: #fff;
-            border-radius: 8px;
-            padding: 24px;
-            border: 1px solid #e5e6eb;
-        }
-
-        footer {
-            margin-top: 64px;
-            padding: 24px;
+        /* 首页特有的展示样式 */
+        .hero-section {
+            padding: 100px 24px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             text-align: center;
-            font-size: 13px;
-            color: #888;
+            border-radius: 24px;
+            margin: 20px auto;
+            max-width: 1100px;
+        }
+        .hero-section h1 {
+            font-size: 48px;
+            color: var(--text-title);
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+        .hero-section p {
+            font-size: 18px;
+            color: var(--text-sec);
+            max-width: 600px;
+            margin: 0 auto;
         }
     </style>
 </head>
@@ -183,100 +34,62 @@
 
 <header>
     <div class="nav">
-        <div class="logo">MyProject</div>
+        <div class="nav-left">
+            <a href="index.html" class="logo">MyProject</a>
+            <nav class="main-nav">
+                <a href="index.html" class="active">首页</a>
+                <a href="article.html">文章列表</a>
+            </nav>
+        </div>
 
         <div class="nav-right">
-            <a href="/">首页</a>
-            <a href="/article/search">文章</a>
+            <a href="javascript:void(0)" class="nav-publish-btn" id="publishBtn">
+                <i data-lucide="pen-line"></i> <span>写文章</span>
+            </a>
 
-            <div class="user-area">
-                <a href="/login.html" id="loginLink">登录</a>
+            <a href="login.html" id="loginLink" class="btn-primary" style="padding: 10px 24px; border-radius: 12px;">登录 / 注册</a>
 
-                <div class="avatar-wrapper" id="avatarWrapper">
-                    <img src="https://via.placeholder.com/32" class="avatar" alt="avatar">
-                    <div class="dropdown">
-                        <a href="/profile">个人中心</a>
-                        <a href="javascript:void(0)" id="logoutBtn">退出登录</a>
+            <div class="avatar-wrapper" id="avatarWrapper" style="display: none; position: relative; padding: 5px 0;">
+                <div class="avatar-container">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="avatar" id="userAvatar">
+                </div>
+
+                <div class="dropdown">
+                    <div class="dropdown-header">账号管理</div>
+                    <div style="padding: 0 12px 10px; font-weight: 700; color: var(--text-title); font-size: 15px;">
+                        <span id="navNickname">用户名</span>
                     </div>
+                    <hr style="border:0; border-top:1px solid #f0f0f0; margin:5px 10px 10px;">
+
+                    <a href="profile.html"><i data-lucide="user"></i> 个人中心</a>
+                    <a href="myArticles.html"><i data-lucide="layout-list"></i> 我的文章</a>
+
+                    <a href="javascript:void(0)" id="logoutBtn" style="color: #FF4D4F; margin-top: 5px;">
+                        <i data-lucide="log-out"></i> 退出登录
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </header>
 
-<section class="hero">
-    <div class="hero-content">
-        <h1>基于 Spring Boot 的后端项目</h1>
-        <p>本项目采用 JWT + Redis 实现统一认证与单点登录。</p>
+<main class="container" style="display: block;"> <section class="hero-section">
+    <h1 id="welcomeText">探索无限可能</h1>
+    <p>基于 Spring Boot 3.0 与现代前端技术构建的高性能内容管理平台。</p>
+    <div style="margin-top: 32px;">
+        <a href="article.html" class="btn-primary">开始阅读</a>
     </div>
 </section>
+</main>
 
-<section class="section">
-    <h2>项目特点</h2>
-    <div class="features">
-        <div class="feature-card">
-            <h3>统一认证体系</h3>
-            <p>基于 JWT 与 Redis 的登录态设计。</p>
-        </div>
-        <div class="feature-card">
-            <h3>清晰的分层架构</h3>
-            <p>Controller / Service / Mapper 职责明确。</p>
-        </div>
-    </div>
-</section>
-
-<footer>
-    © 2026 MyProject · Powered by Spring Boot
+<footer style="text-align: center; padding: 40px; color: var(--text-muted); font-size: 14px;">
+    © 2026 MyProject · Powered by Spring Boot 3.0
 </footer>
 
+<script src="js/index.js"></script>
+<script src="js/nav-bar.js"></script>
 <script>
-    const TOKEN_KEY = "Authorization";
-
-    // 检查登录状态
-    function isLogin() {
-        return !!localStorage.getItem(TOKEN_KEY);
-    }
-
-    // 初始化用户头像区域
-    function initUserArea() {
-        const loginLink = document.getElementById("loginLink");
-        const avatarWrapper = document.getElementById("avatarWrapper");
-
-        if (isLogin()) {
-            loginLink.style.display = "none";
-            avatarWrapper.style.display = "flex"; // 使用 flex 确保对齐
-        } else {
-            loginLink.style.display = "block";
-            avatarWrapper.style.display = "none";
-        }
-    }
-
-    // 退出登录逻辑
-    async function logout() {
-        const token = localStorage.getItem(TOKEN_KEY);
-        try {
-            // 发送请求给后端销毁 Redis 中的 Token
-            await fetch("/user/logout", {
-                method: "POST",
-                headers: {
-                    "Authorization": "Bearer " + token
-                }
-            });
-        } catch (error) {
-            console.error("Logout failed", error);
-        } finally {
-            // 无论后端是否成功，前端都清除本地标识
-            localStorage.removeItem(TOKEN_KEY);
-            window.location.href = "./login.html";
-        }
-    }
-
-    // 绑定事件
-    document.getElementById("logoutBtn").addEventListener("click", logout);
-
-    // 页面加载执行
-    initUserArea();
+    lucide.createIcons();
 </script>
-
 </body>
 </html>

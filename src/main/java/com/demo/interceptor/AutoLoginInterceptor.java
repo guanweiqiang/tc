@@ -8,6 +8,7 @@ import com.demo.util.JWTUtil;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
@@ -25,28 +26,28 @@ public class AutoLoginInterceptor implements HandlerInterceptor {
 
         String authorization = request.getHeader("Authorization");
         if (authorization == null || !authorization.startsWith("Bearer ")) {
-            throw new JWTTokenException("未登录");
+            return true;
         }
 
         String token = authorization.substring(7);
 
         ValueOperations<String, Object> ops = redisTemplate.opsForValue();
         if (ops.get("jwt:blacklist:" + token) != null) {
-            throw new JWTTokenException("token已失效");
+            return true;
         }
 
         Long userId = JWTUtil.parseJWT(token);
         if (userId == null) {
-            throw new JWTTokenException("登陆状态失效");
+            return true;
         }
 
         String key = (String) ops.get("login:active:" + userId);
         if (key == null) {
-            throw new LoginException("登陆已过期");
+            return true;
         }
 
         if (!JWTUtil.parseJti(token).equals(key)) {
-            throw new LoginException("账号在其他设备登录");
+            return true;
         }
 
         UserContext.set(userId);

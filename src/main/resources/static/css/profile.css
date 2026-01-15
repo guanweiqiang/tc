@@ -1,0 +1,222 @@
+/* --- 1. 核心 Grid 布局 --- */
+#profilePageContainer {
+    max-width: 1100px;
+    margin: 40px auto;
+    display: grid;
+    grid-template-columns: 240px 1fr; /* 严格对齐 style.css 的两栏比例 */
+    gap: 32px;
+    padding: 0 24px;
+    align-items: start;
+}
+
+#profilePageContainer input:focus {
+    background: #fff;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-light);
+}
+
+#profilePageContainer input {
+    height: 46px; /* 统一高度 */
+    background: #F5F5F7;
+    border: 1px solid transparent; /* 默认隐藏边框，聚焦再显示 */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- 2. 侧边栏 --- */
+.profile-sidebar {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-sidebar .sidebar-title {
+    padding: 0 0 12px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.profile-sidebar .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    color: var(--text-body);
+    font-size: 14px;
+    margin-bottom: 4px;
+    transition: 0.2s;
+}
+
+.profile-sidebar .menu-item:hover { background: rgba(0, 102, 255, 0.05); }
+
+.profile-sidebar .menu-item.active {
+    background: white;
+    color: var(--primary);
+    font-weight: 600;
+    box-shadow: var(--shadow);
+}
+
+/* --- 3. 主内容卡片 --- */
+.profile-main-content {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(0,0,0,0.02); /* 增加极细边框，提升质感 */
+}
+
+.section-header h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-title);
+}
+
+/* --- 4. 头像上传区域 --- */
+.profile-avatar-upload {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding-bottom: 30px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--border);
+}
+
+.big-avatar-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 4px solid white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    object-fit: cover;
+}
+
+.big-avatar-wrapper { position: relative; }
+.avatar-edit-badge {
+    position: absolute; bottom: 0; right: 0;
+    background: var(--primary); color: white;
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; border: 2px solid white;
+}
+
+/* --- 5. 表单与输入框 --- */
+.section { display: none; }
+.section.active { display: block; }
+
+.form-group { margin-bottom: 24px; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
+
+input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.input-with-btn {
+    display: flex;
+    gap: 12px;
+    align-items: stretch; /* 确保输入框和按钮高度绝对一致 */
+}
+.input-with-btn input { flex: 1; } /* 确保输入框不挤压按钮 */
+
+.btn-primary, .btn-secondary {
+    height: 46px;
+    padding: 0 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background: #E5E5EA;
+    color: var(--text-body);
+}
+
+.btn-secondary:hover {
+    background: #D1D1D6;
+}
+
+.full-width { width: 100%; height: 44px; margin-top: 10px; }
+
+.input-readonly-box {
+    height: 46px;
+    padding: 0 16px;
+    background: #F2F2F7;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-muted);
+}
+
+
+/* 当屏幕宽度小于 768px 时（手机和平板竖屏） */
+@media (max-width: 768px) {
+    /* 1. 核心容器：由两栏改为单栏 */
+    #profilePageContainer {
+        grid-template-columns: 1fr; /* 变成一列 */
+        gap: 20px;
+        padding: 15px; /* 缩小外边距 */
+        margin: 10px auto;
+    }
+
+    /* 2. 侧边栏：改为横向滚动或隐藏，这里推荐改为简单的垂直堆叠 */
+    .profile-sidebar {
+        flex-direction: row; /* 菜单改为横向排列 */
+        overflow-x: auto;   /* 允许左右滑动 */
+        padding-bottom: 10px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .profile-sidebar .menu-item {
+        white-space: nowrap; /* 文字不换行 */
+        padding: 10px 15px;
+        flex-shrink: 0;
+    }
+
+    .profile-sidebar .sidebar-title {
+        display: none; /* 手机端隐藏“设置中心”标题，节省空间 */
+    }
+
+    /* 3. 主内容区：减小内边距 */
+    .profile-main-content {
+        padding: 20px;
+        border-radius: 16px;
+    }
+
+    /* 4. 头像区域适配 */
+    .profile-avatar-upload {
+        flex-direction: column; /* 头像和文字改为上下排列 */
+        text-align: center;
+        gap: 15px;
+    }
+
+    /* 5. 表单按钮适配 */
+    .input-with-btn {
+        flex-direction: column; /* 按钮和输入框上下排 */
+        align-items: stretch;
+    }
+
+    .input-with-btn .btn-primary,
+    .input-with-btn .btn-secondary {
+        width: 100%; /* 按钮占满一行，方便手指点击 */
+    }
+
+    /* 6. 文章列表卡片适配 */
+    .article-meta-bar {
+        flex-wrap: wrap; /* 互动图标自动换行 */
+        gap: 12px;
+    }
+}

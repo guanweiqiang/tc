@@ -33,5 +33,11 @@
         FROM article_like
         WHERE article_id = #{id};
     </select>
+    
+    <select id="isLiked" resultType="int">
+        SELECT 1
+        FROM article_like
+        WHERE article_id = #{articleId} AND user_id = #{userId};
+    </select>
 
 </mapper>

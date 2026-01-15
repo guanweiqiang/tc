@@ -13,8 +13,10 @@ public class ArticleListVO {
     private Long authorId;
     private String authorName;
 
-    private Integer viewCount;
     private Integer likeCount;
+    private Boolean isLiked;
+    private Integer collectCount;
+    private Boolean isCollected;
     private Integer commentCount;
 
     private LocalDateTime createdAt;

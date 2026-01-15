@@ -1,16 +1,34 @@
 package com.demo.service.Impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
+import com.demo.exception.article.ElasticSearchException;
 import com.demo.mapper.ArticleMapper;
 import com.demo.pojo.Article;
+import com.demo.pojo.DTO.ArticleSearchListDTO;
+import com.demo.pojo.UserContext;
+import com.demo.pojo.VO.ArticleDetailVO;
+import com.demo.pojo.VO.ArticleListVO;
+import com.demo.service.ArticleLikeService;
 import com.demo.service.ArticleService;
+import com.demo.util.StringUtil;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.logging.Logger;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
+@Slf4j
 public class ArticleServiceImpl implements ArticleService {
 
     public static final String ES_INDEX = "tc";
@@ -22,15 +40,20 @@ public class ArticleServiceImpl implements ArticleService {
     private ElasticsearchClient elasticsearchClient;
 
     @Resource
-    private Logger logger;
+    private ArticleLikeService articleLikeService;
+
 
     @Override
     public boolean add(Article article) {
+        article.setCreatedAt(LocalDateTime.now());
+        article.setStatus(Byte.valueOf("1"));
+        article.setViewCount(0);
         int insert = mapper.insert(article);
         if (insert != 1) {
-            logger.severe("文章添加到mysql中失败");
+            log.error("文章添加到mysql中失败");
             return false;
         }
+
         try {
             elasticsearchClient.index(i -> i
                     .index(ES_INDEX)
@@ -38,20 +61,117 @@ public class ArticleServiceImpl implements ArticleService {
                     .document(article)
             );
         } catch (IOException e) {
-            logger.severe("文章加入elasticsearch失败！");
+            log.error("文章加入elasticsearch失败！");
         }
-        logger.info("文章" + article.getId() + "加入es成功");
+        log.info("文章{}加入es成功", article.getId());
         return true;
     }
 
     @Override
     public boolean update(Article article) {
-        return mapper.update(article) == 1;
+        article.setUpdatedAt(LocalDateTime.now());
+
+        int update = mapper.update(article);
+        if (update != 1) {
+            log.error("文章更新到mysql失败，id:{}", article.getId());
+            return false;
+        }
+
+        try {
+            elasticsearchClient.update(i -> i
+                            .index(ES_INDEX)
+                            .id(article.getId().toString())
+                            .doc(article),
+                    Article.class);
+        } catch (IOException e) {
+            log.warn("文章更新到es失败，id:{}", article.getId());
+        }
+        return true;
     }
 
     @Override
-    public Article searchDetail(Long id) {
-        return mapper.selectById(id);
+    public List<ArticleListVO> searchList(ArticleSearchListDTO dto) {
+        BoolQuery.Builder bool = QueryBuilders.bool();
+        if (StringUtil.hasText(dto.getKeyword())) {
+            bool.must(q -> q.multiMatch(
+                    m -> m.fields("title", "content")
+                            .query(dto.getKeyword())
+            ));
+        }
+
+        if (dto.getFrom() != null || dto.getTo() != null) {
+            bool.filter(f -> f.range(
+                            r -> r.date(
+                                    d -> {
+                                        d.field("createdAt");
+
+                                        if (dto.getFrom() != null) {
+                                            d.gte(dto.getFrom().atStartOfDay().toString());
+                                        }
+
+                                        if (dto.getTo() != null) {
+                                            d.lte(dto.getTo().atTime(23, 59, 59).toString());
+                                        }
+                                        return d;
+                                    }
+                            )
+                    )
+            );
+        }
+
+        int page = Optional.ofNullable(dto.getPage()).orElse(1);
+        int size = Optional.ofNullable(dto.getSize()).orElse(10);
+
+        int from = (page - 1) * size;
+
+        Long userId = Optional.ofNullable(UserContext.get()).orElse(-1L);
+
+        try {
+            SearchResponse<Article> search = elasticsearchClient.search(builder -> builder
+                            .index(ES_INDEX)
+                            .query(q -> q.bool(bool.build()))
+                            .from(from)
+                            .sort(
+                                    s -> s.field(
+                                            f -> f.field("createdAt")
+                                                    .order(SortOrder.Desc)
+                                    )
+                            ),
+                    Article.class
+            );
+            if (search == null) {
+                return null;
+            }
+            return search.hits().hits().stream().map(Hit::source)
+                    .filter(Objects::nonNull)
+                    .filter(a -> Objects.nonNull(a.getId()))
+                    .map(article -> {
+                        ArticleListVO articleListVO = new ArticleListVO();
+                        BeanUtil.copyProperties(article, articleListVO);
+                        Long id = article.getId();
+                        Long authorId = article.getAuthorId();
+                        articleListVO.setLikeCount(articleLikeService.getLikeCount(id));
+                        articleListVO.setAuthorName(getAuthorName(authorId));
+                        articleListVO.setCommentCount(getCommentCount(id));
+                        articleListVO.setIsLiked(articleLikeService.isLiked(id, userId));
+                        return articleListVO;
+                    }).toList();
+        } catch (IOException e) {
+            log.error("查询失败！");
+            throw new ElasticSearchException("查询失败");
+        }
+
+    }
+
+    @Override
+    public ArticleDetailVO searchDetail(Long id) {
+        ArticleDetailVO articleDetailVO = new ArticleDetailVO();
+        Article article = mapper.selectById(id);
+        BeanUtil.copyProperties(article, articleDetailVO);
+        articleDetailVO.setLikeCount(articleLikeService.getLikeCount(id));
+        articleDetailVO.setCommentCount(getCommentCount(id));
+        articleDetailVO.setAuthorName(getAuthorName(id));
+        return articleDetailVO;
     }
 
     @Override
@@ -59,10 +179,6 @@ public class ArticleServiceImpl implements ArticleService {
         return mapper.getCommentCount(id);
     }
 
-    @Override
-    public Integer getLikeCount(Long id) {
-        return mapper.getLikeCount(id);
-    }
 
     @Override
     public String getAuthorName(Long userId) {

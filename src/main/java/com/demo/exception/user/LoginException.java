@@ -9,6 +9,6 @@ public class LoginException extends GlobalException {
     }
 
     public LoginException(String message) {
-        super(ResponseCode.LOGIN_ERROR.getStatusCode(), message);
+        super(ResponseCode.LOGIN_ERROR.getCode(), message);
     }
 }

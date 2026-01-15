@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>文章编辑 - MyProject</title>
+    <style>
+        :root { --primary-color: #1677ff; }
+        body { font-family: -apple-system, sans-serif; background: #f7f8fa; padding: 40px; }
+        .editor-container { max-width: 800px; margin: 0 auto; background: #fff; padding: 32px; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        h2 { margin-top: 0; color: #1d2129; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; }
+
+        .form-item { margin-bottom: 24px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #4e5969; }
+        input[type="text"], textarea {
+            width: 100%; padding: 12px; border: 1px solid #d9d9d9; border-radius: 4px;
+            box-sizing: border-box; font-size: 14px; transition: all 0.3s;
+        }
+        input:focus, textarea:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
+        textarea { height: 300px; resize: vertical; }
+
+        .btn-group { display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px; }
+        .btn { padding: 10px 24px; border-radius: 4px; cursor: pointer; font-size: 14px; border: 1px solid #d9d9d9; transition: 0.2s; }
+        .btn-primary { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .btn-primary:hover { background: #4096ff; }
+        .btn-cancel { background: #fff; }
+        .btn-cancel:hover { color: var(--primary-color); border-color: var(--primary-color); }
+
+        .loading-mask { display: none; color: #1677ff; font-weight: bold; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="editor-container">
+    <h2 id="pageTitle">发布新文章</h2>
+
+    <div id="loading" class="loading-mask">正在加载原文章内容...</div>
+
+    <div class="form-item">
+        <label>文章标题</label>
+        <input type="text" id="title" placeholder="请输入标题">
+    </div>
+
+    <div class="form-item">
+        <label>文章内容</label>
+        <textarea id="content" placeholder="请输入正文内容..."></textarea>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn btn-cancel" onclick="history.back()">取消</button>
+        <button class="btn btn-primary" id="submitBtn" onclick="submit()">提交保存</button>
+    </div>
+</div>
+
+<script>
+    const API_BASE = "http://192.168.0.101:8080/article";
+    const TOKEN_KEY = "Authorization";
+
+    // 从 URL 获取 ID 参数 (例如: edit.html?id=1)
+    const urlParams = new URLSearchParams(window.location.search);
+    const articleId = urlParams.get('id');
+
+    // 页面加载逻辑
+    window.onload = async () => {
+        if (articleId) {
+            document.getElementById('pageTitle').innerText = "修改文章";
+            await loadOriginalData(articleId);
+        }
+    };
+
+    // 获取请求头
+    function getHeaders() {
+        const token = localStorage.getItem(TOKEN_KEY);
+        return {
+            "Content-Type": "application/json",
+            "Authorization": token ? (token.startsWith("Bearer ") ? token : "Bearer " + token) : ""
+        };
+    }
+
+    // [修改模式专用] 加载原数据
+    async function loadOriginalData(id) {
+        document.getElementById('loading').style.display = 'block';
+        try {
+            const res = await fetch(`${API_BASE}/searchDetail`, {
+                method: "POST",
+                headers: getHeaders(),
+                body: JSON.stringify({ id: id })
+            });
+            const result = await res.json();
+            if (result.code === 200) {
+                document.getElementById('title').value = result.data.title;
+                document.getElementById('content').value = result.data.content;
+            } else {
+                alert("获取原内容失败：" + result.message);
+            }
+        } catch (err) {
+            alert("网络错误，无法加载数据");
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // 提交逻辑 (Add 或 Update)
+    async function submit() {
+        const title = document.getElementById('title').value.trim();
+        const content = document.getElementById('content').value.trim();
+
+        if (!title || !content) {
+            alert("标题和内容不能为空");
+            return;
+        }
+
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = "提交中...";
+
+        // 根据是否有 ID 判断是调用 add 还是 update
+        const isEdit = !!articleId;
+        const url = isEdit ? `${API_BASE}/update` : `${API_BASE}/add`;
+        const method = isEdit ? "PUT" : "POST";
+
+        // 构造数据体
+        const payload = {
+            title: title,
+            content: content
+        };
+        if (isEdit) payload.id = articleId; // 修改时需要传 ID
+
+        try {
+            const res = await fetch(url, {
+                method: method,
+                headers: getHeaders(),
+                body: JSON.stringify(payload)
+            });
+            const result = await res.json();
+
+            if (result.code === 200) {
+                alert(isEdit ? "修改成功！" : "发布成功！");
+                // window.location.href = "list.html"; // 保存成功后跳转回列表页
+            } else {
+                alert("提交失败：" + result.message);
+            }
+        } catch (err) {
+            alert("提交出错，请检查网络或后端跨域设置");
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "提交保存";
+        }
+    }
+</script>
+
+</body>
+</html>

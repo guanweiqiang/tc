@@ -23,7 +23,7 @@ public class JWTUtil {
         Date now = new Date();
         return Jwts.builder()
                 .claim("userId", user.getId())
-                .setId(UUID.randomUUID().toString())
+                .setId(user.getId().toString())
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + KEEPALIVE_TIME))
                 .signWith(SECRET_KEY, SignatureAlgorithm.HS256)

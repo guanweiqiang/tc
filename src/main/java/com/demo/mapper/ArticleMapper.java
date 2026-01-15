@@ -16,7 +16,5 @@ public interface ArticleMapper {
 
     Integer getCommentCount(Long id);
 
-    Integer getLikeCount(Long id);
-
     String getAuthorName(Long userId);
 }

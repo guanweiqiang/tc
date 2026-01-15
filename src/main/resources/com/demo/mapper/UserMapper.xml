@@ -10,21 +10,51 @@
         VALUES (#{username}, #{password}, #{email}, #{username});
     </insert>
 
-    <select id="selectByUsername">
-        SELECT id, username, password, email, nickname
+    <select id="selectByUsername" resultType="user">
+        SELECT id, username, password, email, nickname, avatar_url
         FROM `user`
         WHERE username = #{username};
     </select>
 
-    <select id="selectById">
-        SELECT id, username, password, email, nickname
+    <select id="selectById" resultType="user">
+        SELECT id, username, password, email, nickname, avatar_url
         FROM  `user`
         WHERE id = #{id};
+    </select>
+
+    <select id="selectByEmail" resultType="user">
+        SELECT id, username, password, email, nickname, avatar_url
+        FROM `user`
+        WHERE email = #{email};
     </select>
 
     <update id="updatePassword">
         UPDATE `user`
         SET password = #{newPassword}
+        WHERE id = #{id};
+    </update>
+
+    <update id="updateAvatar">
+        UPDATE `user`
+        SET avatar_url = #{url}
+        WHERE id = #{id};
+    </update>
+
+    <select id="getAvatar" resultType="string">
+        SELECT avatar_url
+        FROM user
+        WHERE id = #{id};
+    </select>
+
+    <update id="updateNickname">
+        UPDATE `user`
+        SET nickname = #{nickname}
+        WHERE id = #{id};
+    </update>
+
+    <update id="updateEmail">
+        UPDATE `user`
+        SET email = #{email}
         WHERE id = #{id};
     </update>
 

@@ -1,0 +1,156 @@
+.article-feed {
+    max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px;
+}
+
+.article-item {
+    background: var(--card-bg);
+    padding: 24px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.article-item:hover {
+    border-color: var(--primary);
+    transform: translateX(6px);
+    box-shadow: var(--shadow);
+}
+
+.article-item h3 { font-size: 19px; color: var(--text-title); margin: 0 0 12px 0; }
+
+.article-meta-bar {
+    display: flex; align-items: center; gap: 24px; color: var(--text-muted); font-size: 13px;
+}
+
+.meta-unit { display: flex; align-items: center; gap: 6px; }
+.meta-unit b { color: var(--text-body); }
+
+/* 分页 */
+.pagination { margin: 40px 0; display: flex; justify-content: center; align-items: center; gap: 12px; }
+.page-btn {
+    width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--border);
+    background: white; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.page-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+
+/* 弹窗遮罩 */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(8px); /* 高斯模糊，非常现代 */
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: all 0.3s ease;
+    z-index: 2000;
+}
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+/* 弹窗主体 */
+.modal-content {
+    background: white;
+    width: 90%; max-width: 700px;
+    max-height: 85vh;
+    border-radius: 24px;
+    padding: 40px;
+    position: relative;
+    overflow-y: auto;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+.modal-overlay.active .modal-content { transform: translateY(0); }
+
+.modal-close {
+    position: absolute; top: 20px; right: 20px;
+    background: #f5f5f7; border: none; width: 32px; height: 32px;
+    border-radius: 50%; cursor: pointer; font-size: 20px;
+}
+
+/* 详情文字排版 */
+.detail-header h1 { font-size: 28px; margin-bottom: 12px; color: var(--text-title); }
+.detail-meta { color: var(--text-muted); font-size: 14px; margin-bottom: 20px; }
+.detail-content { line-height: 1.8; color: var(--text-body); font-size: 16px; }
+.detail-divider { border: 0; border-top: 1px solid var(--border); margin: 24px 0; }
+
+/* 基础可点击单元样式 */
+.action-trigger {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s;
+    user-select: none; /* 防止点击过快选中文字 */
+}
+
+/* 激活状态：主蓝色 */
+.action-trigger[data-action="like"].active {
+    color: var(--primary);
+}
+
+/* 激活状态：星星黄 */
+.action-trigger[data-action="collect"].active {
+    color: #fadb14;
+}
+
+/* 给数字加一点加粗效果 */
+.action-trigger b {
+    font-size: 13px;
+    margin-left: 2px;
+}
+
+.action-trigger:hover {
+    opacity: 0.8;
+}
+
+/* 已激活（已收藏）的状态 */
+.meta-unit.active {
+    color: #fadb14; /* 金黄色 */
+    font-weight: 600;
+}
+
+/* 收藏时的缩放效果 */
+.action-trigger.active i {
+    animation: collectPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes collectPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4); }
+    100% { transform: scale(1); }
+}
+
+/* 加载中的鼠标样式 */
+.action-trigger.loading {
+    cursor: wait;
+    opacity: 0.6;
+}
+
+/* 气泡提示样式 */
+.action-tip {
+    position: absolute;
+    top: -25px;       /* 显示在按钮上方 */
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    pointer-events: none; /* 确保提示框不阻碍鼠标点击 */
+    z-index: 100;
+    animation: tipFadeIn 0.3s ease-out;
+    transition: all 0.3s;
+}
+
+@keyframes tipFadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 10px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}

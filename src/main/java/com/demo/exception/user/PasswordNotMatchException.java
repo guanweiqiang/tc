@@ -10,6 +10,6 @@ public class PasswordNotMatchException extends GlobalException {
     }
 
     public PasswordNotMatchException(String message) {
-        super(ResponseCode.PASSWORD_NOT_MATCH.getStatusCode(), message);
+        super(ResponseCode.PASSWORD_NOT_MATCH.getCode(), message);
     }
 }

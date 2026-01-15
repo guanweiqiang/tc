@@ -16,4 +16,6 @@ public interface ArticleLikeMapper {
 
     Integer getLikeCount(Long id);
 
+    Integer isLiked(@Param("userId") Long userId, @Param("articleId") Long id);
+
 }

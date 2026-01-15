@@ -3,8 +3,8 @@ package com.demo.pojo.DTO;
 import lombok.Data;
 
 @Data
-public class UserLoginDTO {
+public class EmailPwdLoginDTO {
 
-    private String username;
+    private String email;
     private String password;
 }

@@ -10,6 +10,6 @@ public class UserNotExistsException extends GlobalException {
     }
 
     public UserNotExistsException(String message) {
-        super(ResponseCode.USER_NOT_EXISTS.getStatusCode(), message);
+        super(ResponseCode.USER_NOT_EXISTS.getCode(), message);
     }
 }

@@ -13,6 +13,13 @@ public interface ArticleLikeService {
     List<Long> getLikedUsers(Long articleId);
 
     /**
+     * Get the count of likes of article.
+     * @param articleId The id of article.
+     * @return The count of likes.
+     */
+    Integer getLikeCount(Long articleId);
+
+    /**
      * Batch insert into the table;
      * @param id The article id;
      * @param userIds The id of users.
@@ -30,9 +37,17 @@ public interface ArticleLikeService {
     boolean batchDelete(Long id, Set<Object> userIds);
 
     /**
-     * Get the count of the article.
-     * @param id The id of the article.
-     * @return The count of like(s).
+     * Get if the article liked by the user.
+     * @param id The id of article.
+     * @param userId The id of user;
+     * @return True if liked, otherwise false.
      */
-    Integer getLikeCount(Long id);
+    Boolean isLiked(Long id, Long userId);
+
+    /**
+     * Liked or unlike.
+     * @param id The id of article.
+     * @return True if the action is like, otherwise false.
+     */
+    Boolean recordLike(Long id);
 }

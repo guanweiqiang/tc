@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>邮箱验证码</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f6f9fc; font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;">
+<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+    <tr>
+        <td style="background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%); padding: 30px; text-align: center;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 22px; letter-spacing: 1px;">安全验证</h1>
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding: 40px 30px;">
+            <p style="font-size: 16px; color: #4a4a4a; line-height: 1.6;">
+                您好！您正在进行账号验证操作，请在验证码输入框中输入以下代码：
+            </p>
+
+            <div style="text-align: center; margin: 35px 0;">
+                <div style="display: inline-block; background-color: #f0f7ff; border: 2px solid #e1eeff; padding: 15px 35px; border-radius: 10px;">
+                        <span th:text="${code}" style="font-size: 38px; font-weight: bold; color: #007bff; letter-spacing: 8px; font-family: 'Courier New', monospace;">
+                            123456
+                        </span>
+                </div>
+                <p style="margin-top: 15px;">
+                        <span style="color: #ff4d4f; font-size: 14px; font-weight: bold;">
+                            ⏰ 验证码有效期为 1 分钟
+                        </span>
+                </p>
+            </div>
+
+            <p style="font-size: 14px; color: #8c8c8c; line-height: 1.6; border-top: 1px solid #f0f0f0; padding-top: 20px;">
+                * 请勿将此验证码泄露给他人。<br>
+                * 如果这不是您本人操作，请忽略此邮件。
+            </p>
+        </td>
+    </tr>
+
+    <tr>
+        <td style="background-color: #fafafa; padding: 20px; text-align: center;">
+            <p style="font-size: 12px; color: #bfbfbf; margin: 0;">
+                此为系统自动发送邮件，请勿直接回复
+            </p>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

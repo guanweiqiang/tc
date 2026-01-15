@@ -9,7 +9,7 @@ import java.util.UUID;
 @Data
 public class Response<T> {
 
-    private Integer statusCode;
+    private Integer code;
     private String message;
     private Boolean isSuccess;
     private T data;
@@ -21,7 +21,7 @@ public class Response<T> {
     }
 
     private Response(ResponseCode code, T data) {
-        this.statusCode = code.getStatusCode();
+        this.code = code.getCode();
         this.message = code.getMessage();
         this.isSuccess = code.getIsSuccess();
         this.data = data;
@@ -60,7 +60,7 @@ public class Response<T> {
 
     public static <A> Response<A> error(Integer code, String message) {
         Response<A> res = error();
-        res.statusCode = code;
+        res.code = code;
         res.message = message;
         return res;
     }

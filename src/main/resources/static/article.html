@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>探索文章 - MyProject</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/search.css">
+    <link rel="stylesheet" href="css/article.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+<header>
+    <div class="nav">
+        <div class="nav-left">
+            <a href="index.html" class="logo">MyProject</a>
+            <nav class="main-nav">
+                <a href="index.html" class="active">首页</a>
+                <a href="article.html">文章列表</a>
+            </nav>
+        </div>
+
+        <div class="nav-right">
+            <a href="javascript:void(0)" class="nav-publish-btn" id="publishBtn">
+                <i data-lucide="pen-line"></i> <span>写文章</span>
+            </a>
+
+            <a href="login.html" id="loginLink" class="btn-primary" style="padding: 10px 24px; border-radius: 12px;">登录 / 注册</a>
+
+            <div class="avatar-wrapper" id="avatarWrapper" style="display: none; position: relative; padding: 5px 0;">
+                <div class="avatar-container">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="avatar" id="userAvatar">
+                </div>
+
+                <div class="dropdown">
+                    <div class="dropdown-header">账号管理</div>
+                    <div style="padding: 0 12px 10px; font-weight: 700; color: var(--text-title); font-size: 15px;">
+                        <span id="navNickname">用户名</span>
+                    </div>
+                    <hr style="border:0; border-top:1px solid #f0f0f0; margin:5px 10px 10px;">
+
+                    <a href="profile.html"><i data-lucide="user"></i> 个人中心</a>
+                    <a href="myArticles.html"><i data-lucide="layout-list"></i> 我的文章</a>
+
+                    <a href="javascript:void(0)" id="logoutBtn" style="color: #FF4D4F; margin-top: 5px;">
+                        <i data-lucide="log-out"></i> 退出登录
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="container">
+    <div class="feed-layout">
+
+        <section class="search-hero">
+            <div class="search-card">
+                <div class="search-main-row">
+                    <div class="search-input-group">
+                        <i data-lucide="search" class="search-icon"></i>
+                        <input type="text" id="keyword" placeholder="搜你想看的文章...">
+                    </div>
+                    <button class="search-main-btn" onclick="fetchArticles(1)">搜索</button>
+                </div>
+
+                <div class="filter-row">
+                    <div class="filter-item">
+                        <label>作者用户名</label>
+                        <input type="text" id="authorName" class="filter-input" placeholder="输入作者昵称">
+                    </div>
+
+                    <div class="filter-item">
+                        <label>发布时间</label>
+                        <div class="date-range-group">
+                            <input type="date" id="startDate">
+                            <span class="date-separator">至</span>
+                            <input type="date" id="endDate">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="article-feed" id="articleList" style="width: 100%; margin-top: 40px;">
+        </section>
+
+    </div>
+
+    <div class="modal-overlay" id="articleModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div id="modalBody">
+            </div>
+        </div>
+    </div>
+</main>
+
+
+<script src="js/nav-bar.js"></script>
+<script src="js/article.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

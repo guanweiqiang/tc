@@ -1,29 +1,32 @@
 package com.demo.controller;
 
 
-import cn.hutool.core.bean.BeanUtil;
-import com.demo.exception.GlobalException;
-import com.demo.pojo.DTO.UserLoginDTO;
-import com.demo.pojo.DTO.UserRegisterDTO;
+import com.demo.advice.BizLog;
+import com.demo.config.FileUploadProperties;
+import com.demo.pojo.DTO.UpdateEmailDTO;
+import com.demo.pojo.DTO.UpdateNicknameDTO;
 import com.demo.pojo.DTO.UserUpdatePasswordDTO;
+import com.demo.pojo.DTO.VerifyOldEmailDTO;
 import com.demo.pojo.Response;
-import com.demo.pojo.User;
 import com.demo.pojo.UserContext;
-import com.demo.pojo.VO.UserLoginVO;
+import com.demo.pojo.VO.UserProfileVO;
+import com.demo.service.EmailVerificationService;
 import com.demo.service.UserService;
-import com.demo.util.JWTUtil;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import java.util.UUID;
+
+
+@Slf4j
 @RestController
 @RequestMapping("user")
 public class UserController {
@@ -32,67 +35,65 @@ public class UserController {
     private UserService service;
 
     @Resource
-    private RedisTemplate<String, Object> redisTemplate;
+    private FileUploadProperties fileUploadProperties;
 
-    @PostMapping("register")
-    public Response<Void> register(@RequestBody UserRegisterDTO userRegisterReq) {
-        User user = new User();
-        BeanUtil.copyProperties(userRegisterReq, user);
-        service.register(user);
 
-        return Response.ok();
-    }
 
-    @PostMapping("login")
-    public Response<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO) {
-        User user = new User();
-        BeanUtil.copyProperties(userLoginDTO, user);
-        User login = service.login(user);
-
-        UserLoginVO userVO = new UserLoginVO();
-        BeanUtil.copyProperties(login, userVO);
-
-        String token = JWTUtil.generateJWT(login);
-        userVO.setToken(token);
-        redisTemplate.opsForValue().set("login:active:" + login.getId(), JWTUtil.parseJti(token), JWTUtil.KEEPALIVE_TIME, TimeUnit.MILLISECONDS);
-        return Response.ok(userVO);
-    }
-
-    @PutMapping("updatePassword")
+    @PutMapping("changePassword")
+    @BizLog("update password")
     public Response<Void> updatePassword(@RequestBody UserUpdatePasswordDTO dto) {
         Long userId = UserContext.get();
         service.updatePassword(userId, dto.getOldPassword(), dto.getNewPassword());
         return Response.ok();
     }
 
-    @PutMapping("updateAvatar")
-    public Response<Void> updateAvatar(MultipartFile file) {
-        try {
-            file.transferTo(new File("./avatar/" + UserContext.get() + "-" + file.getName()));
-        } catch (IOException e) {
-            throw new GlobalException("头像上传失败");
-        }
-
-        return Response.ok();
-
+    @GetMapping("getAvatar")
+    @BizLog("get avatar")
+    public Response<String> getAvatar() {
+        Long userId = UserContext.get();
+        String avatar = service.getAvatar(userId);
+        return Response.ok(fileUploadProperties.getAvatarUrlPrefix() + avatar);
     }
 
-    @PostMapping("logout")
-    public Response<Void> logout(HttpServletRequest request) {
-        String authorization = request.getHeader("Authorization");
+    @PostMapping("updateAvatar")
+    @BizLog("update avatar")
+    public Response<String> updateAvatar(@RequestParam("file") MultipartFile file) throws IOException {
+        String filename = UUID.randomUUID() + ".png";
+        Path path = Paths.get(fileUploadProperties.getAvatarPath(), filename);
+        Files.createDirectories(path.getParent());
+        Files.copy(file.getInputStream(), path);
+        service.updateAvatar(UserContext.get(), filename);
 
-        String token = authorization.substring(7);
+        return Response.ok(fileUploadProperties.getAvatarUrlPrefix() + filename);
+    }
 
-        Date expiration = JWTUtil.parseExpiration(token);
-        long ttl = expiration.getTime() - System.currentTimeMillis();
-
-        ValueOperations<String, Object> ops = redisTemplate.opsForValue();
-        if (ttl > 0) {
-            ops.set("jwt:blacklist:" + token, 1, ttl, TimeUnit.MILLISECONDS);
-        }
+    @GetMapping("profile")
+    @BizLog("get profile info")
+    public Response<UserProfileVO> profile() {
         Long userId = UserContext.get();
-        ops.getAndDelete("login:active:" + userId);
+        return Response.ok(service.getProfile(userId));
+    }
 
+    @PostMapping("updateNickname")
+    @BizLog("update nickname")
+    public Response<Void> updateNickname(@RequestBody UpdateNicknameDTO updateNicknameDTO) {
+        Long userId = UserContext.get();
+        service.updateNickname(userId, updateNicknameDTO.getNickname());
+        return Response.ok();
+    }
+
+    @PostMapping("verifyOldEmail")
+    @BizLog("verify old email when update email")
+    public Response<String> verifyOldEmail(@RequestBody VerifyOldEmailDTO verifyOldEmailDTO) {
+        String ticket = service.verifyOldEmail(verifyOldEmailDTO);
+        return Response.ok(ticket);
+    }
+
+
+    @PostMapping("updateEmail")
+    @BizLog("update email")
+    public Response<Void> updateEmail(@RequestBody UpdateEmailDTO updateEmailDTO) {
+        service.updateEmail(updateEmailDTO);
         return Response.ok();
     }
 

@@ -1,6 +1,5 @@
 package com.demo.pojo;
 
-import lombok.Data;
 import lombok.Getter;
 
 
@@ -20,18 +19,27 @@ public enum ResponseCode {
     USER_NOT_EXISTS(1001, "用户不存在", false),
     PASSWORD_NOT_MATCH(1002, "密码与用户名不匹配", false),
     JWT_TOKEN_ERROR(1003, "JWT token错误", false),
-    LOGIN_ERROR(1004, "登陆错误", false);
+    LOGIN_ERROR(1004, "登陆错误", false),
+    PROFILE_UPDATE_FAIL(1005, "头像上传失败", false),
+    USER_ALREADY_EXISTS(1006, "用户名已存在", false),
+
+    //auth
+    VERIFICATION_CODE_ERROR(2000, "验证码错误", false),
+
+
+    //elasticsearch
+    ELASTICSEARCH_FAIL(4000, "es搜索失败", false);
 
 
 
 
 
-    private final Integer statusCode;
+    private final Integer code;
     private final String message;
     private final Boolean isSuccess;
 
     ResponseCode(Integer code, String message, Boolean isSuccess) {
-        this.statusCode = code;
+        this.code = code;
         this.message = message;
         this.isSuccess = isSuccess;
     }
