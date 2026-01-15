@@ -1,12 +1,10 @@
 package com.demo.controller;
 
 import cn.hutool.core.bean.BeanUtil;
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.demo.advice.BizLog;
 import com.demo.exception.GlobalException;
 import com.demo.pojo.Article;
 import com.demo.pojo.DTO.ArticleAddDTO;
-import com.demo.pojo.DTO.ArticleSearchDetailDTO;
 import com.demo.pojo.DTO.ArticleSearchListDTO;
 import com.demo.pojo.DTO.ArticleUpdateDTO;
 import com.demo.pojo.Response;

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace等于mapper接口类的全限定名,这样实现对应 -->
+<mapper namespace="com.demo.mapper.ArticleFavoriteMapper">
+
+    <select id="getFavoriteUsers" resultType="long">
+        SELECT user_id
+        FROM article_favorite
+        WHERE article_id = #{articleId};
+    </select>
+
+    <insert id="batchInsert">
+        INSERT INTO article_favorite (article_id, user_id)
+        VALUES
+        <foreach collection="userIds" item="userId" separator=",">
+            (#{articleId}, #{userId})
+        </foreach>
+    </insert>
+
+    <delete id="batchDelete">
+        DELETE
+        FROM article_favorite
+        WHERE article_id = #{articleId}
+        AND user_id IN
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+    </delete>
+
+
+</mapper>

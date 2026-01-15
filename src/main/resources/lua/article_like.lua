@@ -18,7 +18,7 @@ if redis.call("SISMEMBER", KEYS[1], ARGV[1]) == 1 then
     else
         redis.call("SADD", KEYS[3], ARGV[1])
     end
-    return false
+    return 0
 else
     redis.call("SADD", KEYS[1], ARGV[1])
     if redis.call("SISMEMBER", KEYS[3], ARGV[1]) == 1 then
@@ -26,5 +26,5 @@ else
     else
         redis.call("SADD", KEYS[2], ARGV[1])
     end
-    return true
+    return 1
 end

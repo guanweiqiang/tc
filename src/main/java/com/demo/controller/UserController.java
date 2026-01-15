@@ -10,7 +10,6 @@ import com.demo.pojo.DTO.VerifyOldEmailDTO;
 import com.demo.pojo.Response;
 import com.demo.pojo.UserContext;
 import com.demo.pojo.VO.UserProfileVO;
-import com.demo.service.EmailVerificationService;
 import com.demo.service.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

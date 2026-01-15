@@ -14,6 +14,7 @@ import com.demo.pojo.DTO.ArticleSearchListDTO;
 import com.demo.pojo.UserContext;
 import com.demo.pojo.VO.ArticleDetailVO;
 import com.demo.pojo.VO.ArticleListVO;
+import com.demo.service.ArticleFavoriteService;
 import com.demo.service.ArticleLikeService;
 import com.demo.service.ArticleService;
 import com.demo.util.StringUtil;
@@ -41,6 +42,9 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Resource
     private ArticleLikeService articleLikeService;
+
+    @Resource
+    private ArticleFavoriteService articleFavoriteService;
 
 
     @Override
@@ -153,6 +157,8 @@ public class ArticleServiceImpl implements ArticleService {
                         articleListVO.setLikeCount(articleLikeService.getLikeCount(id));
                         articleListVO.setAuthorName(getAuthorName(authorId));
                         articleListVO.setCommentCount(getCommentCount(id));
+                        articleListVO.setFavoriteCount(articleFavoriteService.getFavoriteCount(id));
+                        articleListVO.setIsFavorite(articleFavoriteService.isFavorite(id, userId));
                         articleListVO.setIsLiked(articleLikeService.isLiked(id, userId));
                         return articleListVO;
                     }).toList();

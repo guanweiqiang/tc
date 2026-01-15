@@ -104,8 +104,8 @@ function renderList(articles) {
         const likedClass = art.isLiked ? 'active' : '';
         const likedStyle = art.isLiked ? 'color: var(--primary);' : '';
 
-        const collectedClass = art.isCollected ? 'active' : '';
-        const collectedStyle = art.isCollected ? 'color: #fadb14;' : '';
+        const collectedClass = art.isFavorite ? 'active' : '';
+        const collectedStyle = art.isFavorite ? 'color: #fadb14;' : '';
 
         return `
         <div class="article-item" data-id="${art.id}">
@@ -120,7 +120,7 @@ function renderList(articles) {
                 <div class="meta-unit action-trigger ${collectedClass}" 
                      data-action="collect" style="${collectedStyle}">
                     <i data-lucide="star" size="14"></i>
-                    <span>收藏 <b class="count">${art.collectCount || 0}</b></span>
+                    <span>收藏 <b class="count">${art.favoriteCount || 0}</b></span>
                 </div>
 
                 <div class="meta-unit" onclick="showDetail(${art.id})">
@@ -251,21 +251,24 @@ function triggerLikeAnimation(el) {
 }
 
 async function handleCollect(id, element) {
-    // 1. 检查登录状态 (假设你把 token 存在 localStorage)
+    // 1. 获取登录状态
     const token = localStorage.getItem("Authorization");
     if (!token) {
-        alert("请先登录后再收藏");
-        window.location.href = "login.html";
+        showActionTip(element, "请先登录"); // 使用静默提示
         return;
     }
 
-    // 2. 防止重复点击 (Loading 状态)
-    if (element.classList.contains('loading')) return;
-    element.classList.add('loading');
+    // 2. 状态锁定：使用 dataset.loading 保持与点赞一致的逻辑
+    if (element.dataset.loading === "true") {
+        showActionTip(element, "正在处理...");
+        return;
+    }
+
+    element.dataset.loading = "true";
 
     try {
-        // 3. 调用后端接口 (根据你的后端设计，通常是 POST 切换状态)
-        const res = await fetch(`${API_BASE}/collect/${id}`, {
+        // 3. 调用后端接口
+        const res = await fetch(`${API_BASE}/favorite/${id}`, {
             method: 'POST',
             headers: {
                 "Authorization": token,
@@ -277,34 +280,37 @@ async function handleCollect(id, element) {
         if (result.isSuccess) {
             const countBox = element.querySelector('.count');
             const icon = element.querySelector('i');
-
-            // 假设后端返回 result.data 为 true(已收藏) 或 false(取消收藏)
             const isCollected = result.data;
 
             if (isCollected) {
                 // UI 表现：变为已收藏状态
                 countBox.innerText = parseInt(countBox.innerText) + 1;
-                element.style.color = "#fadb14"; // 经典的星星黄
+                element.style.color = "#fadb14"; // 金黄色
                 element.classList.add('active');
-                // 如果需要切换图标，可以重新渲染图标
-                icon.setAttribute('data-lucide', 'star-full');
+                showActionTip(element, "已加入收藏");
             } else {
                 // UI 表现：取消收藏
                 countBox.innerText = Math.max(0, parseInt(countBox.innerText) - 1);
-                element.style.color = ""; // 恢复默认
+                element.style.color = "";
                 element.classList.remove('active');
-                icon.setAttribute('data-lucide', 'star');
+                showActionTip(element, "已取消收藏");
             }
 
-            // 重新刷新该元素的 Lucide 图标
-            lucide.createIcons();
+            // 触发类似点赞的小动画，让星星动一下
+            triggerLikeAnimation(element);
+
+            // 注意：如果你需要切换图标样式（如空心变实心），取消下面注释
+            // icon.setAttribute('data-lucide', isCollected ? 'star-full' : 'star');
+            // lucide.createIcons();
+
         } else {
-            alert(result.message || "收藏失败");
+            showActionTip(element, result.message || "操作失败");
         }
     } catch (err) {
         console.error("收藏请求出错:", err);
+        showActionTip(element, "网络异常");
     } finally {
-        element.classList.remove('loading');
+        element.dataset.loading = "false";
     }
 }
 

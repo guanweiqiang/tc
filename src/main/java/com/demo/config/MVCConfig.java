@@ -35,6 +35,7 @@ public class MVCConfig implements WebMvcConfigurer {
                 .addPathPatterns("/auth/logout")
                 .addPathPatterns("/article/add")
                 .addPathPatterns("/article/like/**")
+                .addPathPatterns("/article/favorite/**")
                 .order(1);
 
 

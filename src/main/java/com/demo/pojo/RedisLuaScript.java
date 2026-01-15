@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum RedisLuaScript {
 
     ARTICLE_LIKE("lua/article_like.lua"),
-    CURRENT_CHANGE("lua/current_change.lua");
+    CURRENT_CHANGE("lua/current_change.lua"),
+    ARTICLE_FAVORITE("lua/article_favorite.lua");
 
     private final String path;
 

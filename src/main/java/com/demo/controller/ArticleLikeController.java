@@ -26,6 +26,11 @@ public class ArticleLikeController {
     @BizLog("like or unlike the article")
     public Response<Boolean> recordLike(@PathVariable("id") Long id) {
         Boolean b = service.recordLike(id);
+        if (b) {
+            log.info("为文章id:{}点赞成功", id);
+        } else {
+            log.info("文章id:{}取消点赞成功", id);
+        }
         return Response.ok(b);
     }
 

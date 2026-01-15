@@ -29,6 +29,7 @@ public class LogAspect {
         } catch (Throwable e) {
             long end = System.currentTimeMillis();
             log.error("[BIZ_ERR] useId = {}, method name = {}, desc = {}, cost = {}ms", userId, methodName, bizLog.value(), end - start);
+            log.error(e.toString());
             throw e;
         }
 

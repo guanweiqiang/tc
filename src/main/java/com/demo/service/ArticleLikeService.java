@@ -23,18 +23,28 @@ public interface ArticleLikeService {
      * Batch insert into the table;
      * @param id The article id;
      * @param userIds The id of users.
-     * @return True if success, otherwise false.
      */
-    boolean batchInsert(Long id, Set<Object> userIds);
+    void batchInsert(Long id, Set<Object> userIds);
 
 
     /**
      * Batch delete from the table;
      * @param id The article id;
      * @param userIds The id of uses;
-     * @return True if success, other false;
      */
-    boolean batchDelete(Long id, Set<Object> userIds);
+    void batchDelete(Long id, Set<Object> userIds);
+
+
+    /**
+     * Flush one article to the db.
+     * @param articleId The id of article.
+     * @param newLikes The set of new likes.
+     * @param newUnLikes The set of new unlikes.
+     * @return True if success, otherwise false.
+     */
+    Boolean flushOneArticle(Long articleId,
+                            Set<Object> newLikes,
+                            Set<Object> newUnLikes);
 
     /**
      * Get if the article liked by the user.

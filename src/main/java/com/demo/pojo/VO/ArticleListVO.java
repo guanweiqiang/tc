@@ -15,8 +15,8 @@ public class ArticleListVO {
 
     private Integer likeCount;
     private Boolean isLiked;
-    private Integer collectCount;
-    private Boolean isCollected;
+    private Integer favoriteCount;
+    private Boolean isFavorite;
     private Integer commentCount;
 
     private LocalDateTime createdAt;
