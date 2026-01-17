@@ -10,23 +10,22 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.demo.exception.article.ElasticSearchException;
 import com.demo.mapper.ArticleMapper;
 import com.demo.pojo.Article;
-import com.demo.pojo.DTO.ArticleSearchListDTO;
+import com.demo.pojo.dto.ArticleSearchListDTO;
 import com.demo.pojo.UserContext;
-import com.demo.pojo.VO.ArticleDetailVO;
-import com.demo.pojo.VO.ArticleListVO;
-import com.demo.service.ArticleFavoriteService;
-import com.demo.service.ArticleLikeService;
-import com.demo.service.ArticleService;
+import com.demo.pojo.vo.ArticleDetailVO;
+import com.demo.pojo.vo.ArticleListVO;
+import com.demo.service.*;
 import com.demo.util.StringUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -45,6 +44,12 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Resource
     private ArticleFavoriteService articleFavoriteService;
+
+    @Resource
+    private CommentService commentService;
+
+    @Resource
+    private UserService userService;
 
 
     @Override
@@ -93,6 +98,7 @@ public class ArticleServiceImpl implements ArticleService {
         return true;
     }
 
+    //todo:optimize the count of like favorite comment to a hash in redis
     @Override
     public List<ArticleListVO> searchList(ArticleSearchListDTO dto) {
         BoolQuery.Builder bool = QueryBuilders.bool();
@@ -146,18 +152,43 @@ public class ArticleServiceImpl implements ArticleService {
             if (search == null) {
                 return null;
             }
-            return search.hits().hits().stream().map(Hit::source)
+            Stream<Article> articleStream = search.hits().hits().stream().map(Hit::source)
                     .filter(Objects::nonNull)
-                    .filter(a -> Objects.nonNull(a.getId()))
+                    .filter(a -> Objects.nonNull(a.getId()));
+            List<Article> articles = articleStream.toList();
+
+            List<Long> articleIdList = articles.stream()
+                    .map(Article::getId)
+                    .toList();
+
+            Set<Long> authorIds = articles.stream()
+                    .map(Article::getAuthorId)
+                    .collect(Collectors.toSet());
+
+            Map<Long, Integer> likeCountBatch = articleLikeService.getLikeCountBatch(articleIdList);
+            log.debug("likeCountBatch={}", likeCountBatch);
+
+
+            Map<Long, String> nicknameBatch = userService.getNicknameBatch(authorIds);
+            log.debug("nicknameBatch={}", nicknameBatch);
+
+            Map<Long, Integer> commentCountBatch = commentService.getCommentCountBatch(articleIdList);
+            log.debug("commentCountBatch={}", commentCountBatch);
+
+            Map<Long, Integer> favoriteCountBatch = articleFavoriteService.getFavoriteCountBatch(articleIdList);
+            log.debug("favoriteCountBatch={}", favoriteCountBatch);
+
+
+            return articles.stream()
                     .map(article -> {
                         ArticleListVO articleListVO = new ArticleListVO();
                         BeanUtil.copyProperties(article, articleListVO);
                         Long id = article.getId();
                         Long authorId = article.getAuthorId();
-                        articleListVO.setLikeCount(articleLikeService.getLikeCount(id));
-                        articleListVO.setAuthorName(getAuthorName(authorId));
-                        articleListVO.setCommentCount(getCommentCount(id));
-                        articleListVO.setFavoriteCount(articleFavoriteService.getFavoriteCount(id));
+                        articleListVO.setLikeCount(likeCountBatch.get(id));
+                        articleListVO.setAuthorName(nicknameBatch.get(authorId));
+                        articleListVO.setCommentCount(commentCountBatch.get(id));
+                        articleListVO.setFavoriteCount(favoriteCountBatch.get(id));
                         articleListVO.setIsFavorite(articleFavoriteService.isFavorite(id, userId));
                         articleListVO.setIsLiked(articleLikeService.isLiked(id, userId));
                         return articleListVO;
@@ -176,7 +207,7 @@ public class ArticleServiceImpl implements ArticleService {
         BeanUtil.copyProperties(article, articleDetailVO);
         articleDetailVO.setLikeCount(articleLikeService.getLikeCount(id));
         articleDetailVO.setCommentCount(getCommentCount(id));
-        articleDetailVO.setAuthorName(getAuthorName(id));
+        articleDetailVO.setAuthorName(getAuthorName(article.getAuthorId()));
         return articleDetailVO;
     }
 
@@ -184,6 +215,7 @@ public class ArticleServiceImpl implements ArticleService {
     public Integer getCommentCount(Long id) {
         return mapper.getCommentCount(id);
     }
+
 
 
     @Override
@@ -195,4 +227,6 @@ public class ArticleServiceImpl implements ArticleService {
     public boolean delete(Long id) {
         return mapper.delete(id) == 1;
     }
+
+
 }

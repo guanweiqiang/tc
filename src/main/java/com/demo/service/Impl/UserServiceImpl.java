@@ -6,14 +6,16 @@ import com.demo.exception.GlobalException;
 import com.demo.exception.user.ProfileUpdateException;
 import com.demo.exception.user.PasswordNotMatchException;
 import com.demo.mapper.UserMapper;
-import com.demo.pojo.DTO.UpdateEmailDTO;
-import com.demo.pojo.DTO.VerifyOldEmailDTO;
+import com.demo.pojo.dto.UpdateEmailDTO;
+import com.demo.pojo.dto.UserIdNicknameDTO;
+import com.demo.pojo.dto.VerifyOldEmailDTO;
 import com.demo.pojo.EmailVerifyPurpose;
 import com.demo.pojo.User;
 import com.demo.pojo.UserContext;
-import com.demo.pojo.VO.UserProfileVO;
+import com.demo.pojo.vo.UserProfileVO;
 import com.demo.service.EmailVerificationService;
 import com.demo.service.UserService;
+import com.demo.util.StringUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -22,8 +24,9 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -78,10 +81,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public String getAvatar(Long userId) {
         String avatar = mapper.getAvatar(userId);
-        if (avatar == null) {
-            return "default.png";
-        }
-        return avatar;
+        return buildAvatar(avatar);
     }
 
     @Override
@@ -89,10 +89,8 @@ public class UserServiceImpl implements UserService {
         User user = mapper.selectById(userId);
         UserProfileVO userProfileVO = new UserProfileVO();
         BeanUtil.copyProperties(user, userProfileVO);
-        if (user.getAvatarUrl() == null) {
-            user.setAvatarUrl("default.png");
-        }
-        userProfileVO.setAvatar(fileUploadProperties.getAvatarUrlPrefix() + user.getAvatarUrl());
+
+        userProfileVO.setAvatar(buildAvatar(user.getAvatarUrl()));
         return userProfileVO;
     }
 
@@ -106,7 +104,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String verifyOldEmail(VerifyOldEmailDTO verifyOldEmailDTO) {
-        //get the old email
+        //getRootComment the old email
         Long userId = UserContext.get();
         String email = mapper.selectById(userId).getEmail();
         emailVerificationService.verify(email, verifyOldEmailDTO.getCode(), EmailVerifyPurpose.UPDATE_EMAIL_OLD);
@@ -150,5 +148,51 @@ public class UserServiceImpl implements UserService {
 
         //delete the ticket
         redisTemplate.delete(key);
+    }
+
+    @Override
+    public String getUsername(Long userId) {
+        return mapper.getUsername(userId);
+    }
+
+    @Override
+    public String getNickname(Long userId) {
+        return mapper.getNickname(userId);
+    }
+
+    @Override
+    public Map<Long, String> getNicknameBatch(Set<Long> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
+            return Map.of();
+        }
+
+        return mapper.getNicknameBatch(userIds).stream()
+                .collect(Collectors.toMap(
+                        UserIdNicknameDTO::getId,
+                        UserIdNicknameDTO::getNickname
+                ));
+    }
+
+    @Override
+    public Map<Long, User> getUserBatch(Set<Long> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
+            return Map.of();
+        }
+        return mapper.getUserBatch(userIds).stream()
+                .collect(Collectors.toMap(
+                        User::getId,
+                        u -> u
+                ));
+    }
+
+
+
+
+    @Override
+    public String buildAvatar(String avatar) {
+        if (!StringUtil.hasText(avatar)) {
+            avatar = "default.png";
+        }
+        return fileUploadProperties.getAvatarUrlPrefix() + avatar;
     }
 }

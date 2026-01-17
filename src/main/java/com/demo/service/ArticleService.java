@@ -1,11 +1,12 @@
 package com.demo.service;
 
 import com.demo.pojo.Article;
-import com.demo.pojo.DTO.ArticleSearchListDTO;
-import com.demo.pojo.VO.ArticleDetailVO;
-import com.demo.pojo.VO.ArticleListVO;
+import com.demo.pojo.dto.ArticleSearchListDTO;
+import com.demo.pojo.vo.ArticleDetailVO;
+import com.demo.pojo.vo.ArticleListVO;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ArticleService {
 
@@ -20,6 +21,8 @@ public interface ArticleService {
     ArticleDetailVO searchDetail(Long id);
 
     Integer getCommentCount(Long id);
+
+//    Map<Long, Integer> getCommentCountBatch();
 
     String getAuthorName(Long id);
 }

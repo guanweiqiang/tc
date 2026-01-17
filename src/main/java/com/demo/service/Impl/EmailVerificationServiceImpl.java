@@ -105,7 +105,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         String key = "email:verify:" + purpose.name() + ":" + email;
 
         //check whether the verification code expired
-        //for safe, the code are allowed to get one time
+        //for safe, the code are allowed to getRootComment one time
         //if fail at the first time, it should apply again
         String verify = (String)redisTemplate.opsForValue().get(key);
         if (verify == null) {

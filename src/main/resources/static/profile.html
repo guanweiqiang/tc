@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>个人中心 - MyProject</title>
-<!--    <link rel="stylesheet" href="css/style.css">-->
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/profile.css">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -16,21 +15,21 @@
         <div class="nav-left">
             <a href="index.html" class="logo">MyProject</a>
             <nav class="main-nav">
-                <a href="index.html" class="active">首页</a>
+                <a href="index.html">首页</a>
                 <a href="article.html">文章列表</a>
             </nav>
         </div>
 
         <div class="nav-right">
-            <a href="javascript:void(0)" class="nav-publish-btn" id="publishBtn">
+            <a href="add-article.html" class="nav-publish-btn" id="publishBtn">
                 <i data-lucide="pen-line"></i> <span>写文章</span>
             </a>
 
-            <a href="login.html" id="loginLink" class="btn-primary" style="padding: 10px 24px; border-radius: 12px;">登录 / 注册</a>
+            <a href="login.html" id="loginLink" class="btn-primary" style="padding: 10px 24px; border-radius: 12px; display: none;">登录 / 注册</a>
 
             <div class="avatar-wrapper" id="avatarWrapper" style="display: none; position: relative; padding: 5px 0;">
                 <div class="avatar-container">
-                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="avatar" id="userAvatar">
+                    <img src="" class="avatar" id="navAvatar">
                 </div>
 
                 <div class="dropdown">
@@ -55,13 +54,13 @@
 <div id="profilePageContainer">
     <aside class="profile-sidebar">
         <div class="sidebar-title">设置中心</div>
-        <div class="menu-item active" onclick="switchTab('info', this)">
+        <div class="menu-item active" data-tab="info">
             <i data-lucide="user-circle"></i> <span>基本资料</span>
         </div>
-        <div class="menu-item" onclick="switchTab('email', this)">
+        <div class="menu-item" data-tab="email">
             <i data-lucide="mail"></i> <span>修改邮箱</span>
         </div>
-        <div class="menu-item" onclick="switchTab('pwd', this)">
+        <div class="menu-item" data-tab="pwd">
             <i data-lucide="shield-check"></i> <span>修改密码</span>
         </div>
     </aside>
@@ -75,15 +74,15 @@
 
             <div class="profile-avatar-upload">
                 <div class="big-avatar-wrapper">
-                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="big-avatar-circle" id="mainAvatar">
+                    <img src="" class="big-avatar-circle" id="mainAvatar" alt="用户头像">
                     <label for="avatarInput" class="avatar-edit-badge">
                         <i data-lucide="camera" size="16"></i>
                     </label>
                 </div>
-                <input type="file" id="avatarInput" hidden onchange="uploadFile()">
+                <input type="file" id="avatarInput" hidden accept="image/*">
                 <div class="avatar-info">
                     <h3 style="font-size: 18px; color: var(--text-title);">个人头像</h3>
-                    <p>点击图标更换头像，支持更清晰的展示效果</p>
+                    <p>点击相机图标更换头像，支持 JPG/PNG 格式</p>
                 </div>
             </div>
 
@@ -98,15 +97,14 @@
                     <label>昵称</label>
                     <div class="input-with-btn">
                         <input type="text" id="nickname" placeholder="想个好听的名字...">
-                        <button class="btn-primary" onclick="saveNickname()">更新</button>
+                        <button class="btn-primary" id="btnUpdateNickname">更新</button>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label>当前绑定邮箱</label>
                     <div class="input-readonly-box">
-                        <span id="emailDisplay">example@mail.com</span>
-                        <a href="javascript:void(0)" onclick="switchTab('email', document.querySelectorAll('.menu-item')[1])">更改</a>
+                        <span id="emailDisplay">加载中...</span>
                     </div>
                 </div>
             </div>
@@ -129,10 +127,10 @@
                         <label>验证码</label>
                         <div class="input-with-btn">
                             <input type="text" id="oldEmailCode" placeholder="输入旧邮箱验证码">
-                            <button class="btn-secondary" id="sendOldBtn" onclick="sendOldEmailCode()">获取验证码</button>
+                            <button class="btn-secondary" id="sendOldBtn">获取验证码</button>
                         </div>
                     </div>
-                    <button class="btn-primary full-width" onclick="verifyOldEmail()">下一步</button>
+                    <button class="btn-primary full-width" id="btnVerifyOldEmail">下一步</button>
                 </div>
             </div>
 
@@ -146,11 +144,11 @@
                         <label>新邮箱验证码</label>
                         <div class="input-with-btn">
                             <input type="text" id="newEmailCode" placeholder="输入新邮箱验证码">
-                            <button class="btn-secondary" id="sendNewBtn" onclick="sendNewEmailCode()">获取验证码</button>
+                            <button class="btn-secondary" id="sendNewBtn">获取验证码</button>
                         </div>
                     </div>
-                    <button class="btn-primary full-width" onclick="saveNewEmail()">确认绑定</button>
-                    <button class="btn-ghost" style="width: 100%; margin-top: 10px;" onclick="resetEmailStep()">返回上一步</button>
+                    <button class="btn-primary full-width" id="btnSaveNewEmail">确认绑定</button>
+                    <button class="btn-ghost" id="btnResetEmailStep" style="width: 100%; margin-top: 10px;">返回上一步</button>
                 </div>
             </div>
 
@@ -169,28 +167,28 @@
                 </div>
                 <div class="form-group">
                     <label>新密码</label>
-                    <div class="password-input-wrapper">
+                    <div class="password-input-wrapper" style="position: relative;">
                         <input type="password" id="newPwd" placeholder="至少 8 位，包含字母数字">
-                        <i data-lucide="eye" class="toggle-pwd" onclick="togglePwd('newPwd')"></i>
+                        <i data-lucide="eye" class="toggle-pwd" data-target="newPwd"
+                           style="position: absolute; right: 12px; top: 12px; cursor: pointer; color: #999;"></i>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>确认新密码</label>
                     <input type="password" id="confirmPwd" placeholder="请再次输入新密码">
                 </div>
-                <button class="btn-primary full-width" onclick="savePwd()">重置密码</button>
+                <button class="btn-primary full-width" id="btnSavePwd">重置密码</button>
             </div>
             <div id="pwdMsg" class="msg-tip"></div>
         </section>
     </main>
 </div>
 
-
-<script src="js/nav-bar.js"></script>
-<script src="./js/profile.js"></script>
+<script type="module" src="js/nav-bar.js"></script>
+<script type="module" src="js/profile.js"></script>
 
 <script>
-    // 初始化图标
+    // 渲染页面初始图标
     lucide.createIcons();
 </script>
 </body>

@@ -3,13 +3,13 @@ package com.demo.controller;
 
 import com.demo.advice.BizLog;
 import com.demo.config.FileUploadProperties;
-import com.demo.pojo.DTO.UpdateEmailDTO;
-import com.demo.pojo.DTO.UpdateNicknameDTO;
-import com.demo.pojo.DTO.UserUpdatePasswordDTO;
-import com.demo.pojo.DTO.VerifyOldEmailDTO;
+import com.demo.pojo.dto.UpdateEmailDTO;
+import com.demo.pojo.dto.UpdateNicknameDTO;
+import com.demo.pojo.dto.UserUpdatePasswordDTO;
+import com.demo.pojo.dto.VerifyOldEmailDTO;
 import com.demo.pojo.Response;
 import com.demo.pojo.UserContext;
-import com.demo.pojo.VO.UserProfileVO;
+import com.demo.pojo.vo.UserProfileVO;
 import com.demo.service.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

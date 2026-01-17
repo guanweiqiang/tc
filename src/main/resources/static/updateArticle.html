@@ -46,107 +46,12 @@
     </div>
 
     <div class="btn-group">
-        <button class="btn btn-cancel" onclick="history.back()">取消</button>
-        <button class="btn btn-primary" id="submitBtn" onclick="submit()">提交保存</button>
+        <button class="btn btn-cancel" id="cancelBtn">取消</button>
+        <button class="btn btn-primary" id="submitBtn">提交保存</button>
     </div>
 </div>
 
-<script>
-    const API_BASE = "http://192.168.0.101:8080/article";
-    const TOKEN_KEY = "Authorization";
-
-    // 从 URL 获取 ID 参数 (例如: edit.html?id=1)
-    const urlParams = new URLSearchParams(window.location.search);
-    const articleId = urlParams.get('id');
-
-    // 页面加载逻辑
-    window.onload = async () => {
-        if (articleId) {
-            document.getElementById('pageTitle').innerText = "修改文章";
-            await loadOriginalData(articleId);
-        }
-    };
-
-    // 获取请求头
-    function getHeaders() {
-        const token = localStorage.getItem(TOKEN_KEY);
-        return {
-            "Content-Type": "application/json",
-            "Authorization": token ? (token.startsWith("Bearer ") ? token : "Bearer " + token) : ""
-        };
-    }
-
-    // [修改模式专用] 加载原数据
-    async function loadOriginalData(id) {
-        document.getElementById('loading').style.display = 'block';
-        try {
-            const res = await fetch(`${API_BASE}/searchDetail`, {
-                method: "POST",
-                headers: getHeaders(),
-                body: JSON.stringify({ id: id })
-            });
-            const result = await res.json();
-            if (result.code === 200) {
-                document.getElementById('title').value = result.data.title;
-                document.getElementById('content').value = result.data.content;
-            } else {
-                alert("获取原内容失败：" + result.message);
-            }
-        } catch (err) {
-            alert("网络错误，无法加载数据");
-        } finally {
-            document.getElementById('loading').style.display = 'none';
-        }
-    }
-
-    // 提交逻辑 (Add 或 Update)
-    async function submit() {
-        const title = document.getElementById('title').value.trim();
-        const content = document.getElementById('content').value.trim();
-
-        if (!title || !content) {
-            alert("标题和内容不能为空");
-            return;
-        }
-
-        const submitBtn = document.getElementById('submitBtn');
-        submitBtn.disabled = true;
-        submitBtn.innerText = "提交中...";
-
-        // 根据是否有 ID 判断是调用 add 还是 update
-        const isEdit = !!articleId;
-        const url = isEdit ? `${API_BASE}/update` : `${API_BASE}/add`;
-        const method = isEdit ? "PUT" : "POST";
-
-        // 构造数据体
-        const payload = {
-            title: title,
-            content: content
-        };
-        if (isEdit) payload.id = articleId; // 修改时需要传 ID
-
-        try {
-            const res = await fetch(url, {
-                method: method,
-                headers: getHeaders(),
-                body: JSON.stringify(payload)
-            });
-            const result = await res.json();
-
-            if (result.code === 200) {
-                alert(isEdit ? "修改成功！" : "发布成功！");
-                // window.location.href = "list.html"; // 保存成功后跳转回列表页
-            } else {
-                alert("提交失败：" + result.message);
-            }
-        } catch (err) {
-            alert("提交出错，请检查网络或后端跨域设置");
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerText = "提交保存";
-        }
-    }
-</script>
+<script type="module" src="js/update-article.js"></script>
 
 </body>
 </html>

@@ -9,6 +9,8 @@ public class Comment {
 
     private Long id;
     private Long articleId;
+    private Long rootId;
+    private Long replyToId;
     private Long userId;
     private String content;
     private LocalDateTime createdAt;

@@ -28,16 +28,16 @@
 <div class="register-container">
     <h2>用户注册</h2>
 
-    <input type="text" id="username" placeholder="用户名">
-    <input type="password" id="password" placeholder="密码">
-    <input type="email" id="email" placeholder="邮箱">
+    <input type="text" id="username" placeholder="用户名" autocomplete="username">
+    <input type="password" id="password" placeholder="密码" autocomplete="new-password">
+    <input type="email" id="email" placeholder="邮箱" autocomplete="email">
 
     <div class="code-container">
         <input type="text" id="verifyCode" placeholder="验证码">
-        <button id="sendBtn" onclick="sendCode()">获取验证码</button>
+        <button id="sendBtn">获取验证码</button>
     </div>
 
-    <button class="btn-reg" onclick="register()">立即注册</button>
+    <button class="btn-reg" id="regBtn">立即注册</button>
 
     <div class="back">
         <a href="login.html">返回登录</a>
@@ -46,99 +46,7 @@
     <div id="errorMsg" class="error"></div>
 </div>
 
-<script>
-    let countdown = 60;
-    let timer = null;
-
-    const BASE_URL = "http://192.168.0.101:8080";
-
-    // --- 修改后的发送验证码函数 ---
-    function sendCode() {
-        const email = document.getElementById("email").value.trim();
-        const errorMsg = document.getElementById("errorMsg");
-        const sendBtn = document.getElementById("sendBtn");
-
-        if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-            errorMsg.innerText = "请输入正确的邮箱地址";
-            return;
-        }
-
-        errorMsg.innerText = "";
-        sendBtn.disabled = true;
-
-        // 这里拼接了 purpose=register 参数
-        const url = BASE_URL + `/auth/sendVerificationCode?email=${email}&purpose=REGISTER`;
-
-        fetch(url, {
-            method: "GET"
-        })
-            .then(res => res.json())
-            .then(res => {
-                if (res.isSuccess) {
-                    startCountdown();
-                } else {
-                    // 如果后端返回“邮箱已注册”，这里会直接显示
-                    errorMsg.innerText = res.message;
-                    sendBtn.disabled = false;
-                }
-            })
-            .catch(() => {
-                errorMsg.innerText = "邮件服务繁忙，请稍后再试";
-                sendBtn.disabled = false;
-            });
-    }
-
-    function startCountdown() {
-        const sendBtn = document.getElementById("sendBtn");
-        timer = setInterval(() => {
-            if (countdown > 0) {
-                sendBtn.innerText = `${countdown}s 后重新获取`;
-                countdown--;
-            } else {
-                clearInterval(timer);
-                sendBtn.innerText = "获取验证码";
-                sendBtn.disabled = false;
-                countdown = 60;
-            }
-        }, 1000);
-    }
-
-    function register() {
-        const username = document.getElementById("username").value.trim();
-        const password = document.getElementById("password").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const verifyCode = document.getElementById("verifyCode").value.trim();
-        const errorMsg = document.getElementById("errorMsg");
-
-        if (!username || !password || !email || !verifyCode) {
-            errorMsg.innerText = "所有字段均为必填项";
-            return;
-        }
-
-        fetch(BASE_URL + "/auth/register", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                username: username,
-                password: password,
-                email: email,
-                code: verifyCode
-            })
-        })
-            .then(res => res.json())
-            .then(res => {
-                if (res.isSuccess === true) {
-                    alert("注册成功！");
-                    window.location.href = "login.html";
-                } else {
-                    errorMsg.innerText = res.message;
-                }
-            })
-            .catch(() => {
-                errorMsg.innerText = "服务器异常，请稍后再试";
-            });
-    }
-</script>
+<script type="module" src="js/register.js"></script>
 
 </body>
 </html>

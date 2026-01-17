@@ -8,12 +8,13 @@ import com.demo.service.ArticleFavoriteService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -25,6 +26,9 @@ public class ArticleFavoriteServiceImpl implements ArticleFavoriteService {
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
+
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
     @Resource
     private RedisLuaScriptManager scriptManager;
@@ -60,23 +64,63 @@ public class ArticleFavoriteServiceImpl implements ArticleFavoriteService {
         String key = FAVORITE + articleId;
         String countKey = COUNT + articleId;
         String initKey = INIT + articleId;
-        if (Boolean.TRUE.equals(redisTemplate.hasKey(initKey))) {
-            redisTemplate.expire(key, 1, TimeUnit.MINUTES);
-            redisTemplate.expire(initKey, 1, TimeUnit.MINUTES);
-            redisTemplate.expire(countKey, 1, TimeUnit.MINUTES);
+
+        int ttl = 60;
+
+        Long res = stringRedisTemplate.execute(
+                scriptManager.get(RedisLuaScript.ENSURE_CACHE, Long.class),
+                List.of(key, countKey, initKey),
+                String.valueOf(ttl), "3"
+        );
+
+        Objects.requireNonNull(res);
+        //ready
+        if (res == 1) {
+            log.debug("文章点赞id={}已在缓存，更新过期时间", articleId);
+            return;
+        } else if (res == 2) {
+            //loading
             return;
         }
 
-        List<Long> favoriteUsers = getFavoriteUsers(articleId);
-        if (!favoriteUsers.isEmpty()) {
-            redisTemplate.opsForValue().set(countKey, favoriteUsers.size());
-            redisTemplate.opsForValue().set(initKey, 1);
-            redisTemplate.opsForSet().add(key, favoriteUsers.toArray());
-
-            redisTemplate.expire(key, 1, TimeUnit.MINUTES);
-            redisTemplate.expire(initKey, 1, TimeUnit.MINUTES);
-            redisTemplate.expire(countKey, 1, TimeUnit.MINUTES);
+        List<Long> userIds = getFavoriteUsers(articleId);
+        log.debug("articleId={}, userIds={}", articleId, userIds);
+        if (userIds.isEmpty()) {
+            return;
         }
+
+        List<String> args = new ArrayList<>();
+        args.add(String.valueOf(ttl));
+        for (Long userId : userIds) {
+            args.add(String.valueOf(userId));
+        }
+
+
+        stringRedisTemplate.execute(
+                scriptManager.get(RedisLuaScript.COMMIT_CACHE, Void.class),
+                List.of(key, countKey, initKey),
+                args.toArray()
+        );
+        log.debug("将id={}的文章点赞加入缓存", articleId);
+
+
+//        if (Boolean.TRUE.equals(redisTemplate.hasKey(initKey))) {
+//            redisTemplate.expire(key, 1, TimeUnit.MINUTES);
+//            redisTemplate.expire(initKey, 1, TimeUnit.MINUTES);
+//            redisTemplate.expire(countKey, 1, TimeUnit.MINUTES);
+//            return;
+//        }
+//
+//        List<Long> favoriteUsers = getFavoriteUsers(articleId);
+//        if (!favoriteUsers.isEmpty()) {
+//            redisTemplate.opsForValue().set(countKey, favoriteUsers.size());
+//            redisTemplate.opsForValue().set(initKey, 1);
+//            redisTemplate.opsForSet().add(key, favoriteUsers.toArray());
+//
+//            redisTemplate.expire(key, 1, TimeUnit.MINUTES);
+//            redisTemplate.expire(initKey, 1, TimeUnit.MINUTES);
+//            redisTemplate.expire(countKey, 1, TimeUnit.MINUTES);
+//        }
 
 
     }
@@ -115,8 +159,31 @@ public class ArticleFavoriteServiceImpl implements ArticleFavoriteService {
         return (Integer) value;
     }
 
+    @Override
+    public Map<Long, Integer> getFavoriteCountBatch(List<Long> articleIds) {
+        articleIds.forEach(this::ensureFavoriteCache);
+
+        List<Object> list = redisTemplate.opsForValue().multiGet(
+                articleIds.stream()
+                        .map(id -> COUNT + id)
+                        .toList()
+        );
+
+        if (list == null || list.isEmpty()) {
+            return Map.of();
+        }
+
+        Map<Long, Integer> map = new HashMap<>();
+        for (int i = 0; i < articleIds.size(); i++) {
+            if (list.get(i) == null) {
+                continue;
+            }
+            map.put(articleIds.get(i), (Integer) list.get(i));
+        }
 
 
+        return map;
+    }
 
     @Transactional
     public Boolean flushOneArticle(Long articleId, Set<Object> likes, Set<Object> unLikes) {

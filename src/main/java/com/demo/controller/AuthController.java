@@ -2,13 +2,13 @@ package com.demo.controller;
 
 
 import com.demo.advice.BizLog;
-import com.demo.pojo.DTO.EmailCodeLoginDTO;
-import com.demo.pojo.DTO.EmailPwdLoginDTO;
-import com.demo.pojo.DTO.LoginDTO;
-import com.demo.pojo.DTO.UserRegisterDTO;
+import com.demo.pojo.dto.EmailCodeLoginDTO;
+import com.demo.pojo.dto.EmailPwdLoginDTO;
+import com.demo.pojo.dto.LoginDTO;
+import com.demo.pojo.dto.UserRegisterDTO;
 import com.demo.pojo.EmailVerifyPurpose;
 import com.demo.pojo.Response;
-import com.demo.pojo.VO.UserLoginVO;
+import com.demo.pojo.vo.UserLoginVO;
 import com.demo.service.AuthService;
 import jakarta.annotation.Resource;
 import jakarta.mail.MessagingException;

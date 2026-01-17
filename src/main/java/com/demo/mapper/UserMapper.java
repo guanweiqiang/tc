@@ -2,8 +2,14 @@ package com.demo.mapper;
 
 
 import com.demo.pojo.User;
+import com.demo.pojo.dto.UserIdNicknameDTO;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Mapper
 public interface UserMapper {
@@ -25,5 +31,13 @@ public interface UserMapper {
     int updateNickname(@Param("id") Long id, @Param("nickname") String nickname);
 
     int updateEmail(@Param("id") Long id, @Param("email") String email);
+
+    String getUsername(Long userId);
+
+    String getNickname(Long userId);
+
+    List<UserIdNicknameDTO> getNicknameBatch(Set<Long> userIds);
+
+    List<User> getUserBatch(@Param("userIds") Set<Long> userIds);
 
 }

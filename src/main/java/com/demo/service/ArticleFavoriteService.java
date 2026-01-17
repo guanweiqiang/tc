@@ -1,6 +1,7 @@
 package com.demo.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface ArticleFavoriteService {
@@ -25,6 +26,14 @@ public interface ArticleFavoriteService {
      * @return The count of favorite.
      */
     Integer getFavoriteCount(Long articleId);
+
+
+    /**
+     * Get the count of favorite batch.
+     * @param articleIds The set of article id.
+     * @return A map, key is the article id, value is the count.
+     */
+    Map<Long, Integer> getFavoriteCountBatch(List<Long> articleIds);
 
     /**
      * Get whether the article is favorite of the user

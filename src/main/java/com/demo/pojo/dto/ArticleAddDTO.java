@@ -1,11 +1,11 @@
-package com.demo.pojo.DTO;
+package com.demo.pojo.dto;
 
 import lombok.Data;
 
 @Data
-public class ArticleUpdateDTO {
+public class ArticleAddDTO {
 
-    private Integer id;
     private String title;
     private String content;
+
 }

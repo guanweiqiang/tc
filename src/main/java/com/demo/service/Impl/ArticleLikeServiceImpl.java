@@ -10,12 +10,13 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -27,6 +28,9 @@ public class ArticleLikeServiceImpl implements ArticleLikeService {
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
+
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
     @Resource
     private RedisLuaScriptManager scriptManager;
@@ -72,26 +76,69 @@ public class ArticleLikeServiceImpl implements ArticleLikeService {
     private void ensureLikeCache(Long articleId) {
         String likeKey = LIKE + articleId;
         String initKey = INIT + articleId;
-        if (Boolean.TRUE.equals(redisTemplate.hasKey(initKey))) {
-            log.info("已存在key{}，更新过期时间", likeKey);
-            redisTemplate.expire(likeKey, 1, TimeUnit.MINUTES);
-            redisTemplate.expire(initKey, 1, TimeUnit.MINUTES);
+        String countKey = COUNT + articleId;
+
+        int ttl = 60;
+
+
+        Long res = stringRedisTemplate.execute(
+                scriptManager.get(RedisLuaScript.ENSURE_CACHE, Long.class),
+                List.of(likeKey, countKey, initKey),
+                String.valueOf(ttl), "3"
+        );
+        Objects.requireNonNull(res);
+        //ready
+        if (res == 1) {
+            log.debug("文章点赞id={}已在缓存，更新过期时间", articleId);
+            return;
+        } else if (res == 2) {
+            //loading
             return;
         }
 
-        String countKey = COUNT + articleId;
         List<Long> userIds = getLikedUsers(articleId);
-        if (!userIds.isEmpty()) {
-            log.info("冷加载，{}，将db中的数据加入redis中", likeKey);
-            redisTemplate.opsForSet().add(likeKey, userIds.toArray());
-            redisTemplate.opsForValue().set(initKey, 1);
-            redisTemplate.opsForValue().set(countKey, userIds.size(), 1, TimeUnit.MINUTES);
-
-
-            redisTemplate.expire(likeKey, 1, TimeUnit.MINUTES);
-            redisTemplate.expire(initKey, 1, TimeUnit.MINUTES);
-
+        log.debug("articleId={}, userIds={}", articleId, userIds);
+        if (userIds.isEmpty()) {
+            return;
         }
+
+        List<String> args = new ArrayList<>();
+        args.add(String.valueOf(ttl));
+        for (Long userId : userIds) {
+            args.add(String.valueOf(userId));
+        }
+
+        //must use stringRedisTemplate or diy the redisTemplate
+        //because lua will treat the array as an object
+        stringRedisTemplate.execute(
+                scriptManager.get(RedisLuaScript.COMMIT_CACHE, Void.class),
+                List.of(likeKey, countKey, initKey),
+                args.toArray()
+        );
+        log.debug("将id={}的文章点赞加入缓存", articleId);
+
+
+//        if (Boolean.TRUE.equals(redisTemplate.hasKey(initKey))) {
+//            log.info("已存在key{}，更新过期时间", likeKey);
+//            redisTemplate.expire(likeKey, 1, TimeUnit.MINUTES);
+//            redisTemplate.expire(initKey, 1, TimeUnit.MINUTES);
+//            redisTemplate.expire(countKey, 1, TimeUnit.MINUTES);
+//            return;
+//        }
+//
+//
+//        List<Long> userIds = getLikedUsers(articleId);
+//        if (!userIds.isEmpty()) {
+//            log.info("冷加载，{}，将db中的数据加入redis中", likeKey);
+//            redisTemplate.opsForSet().add(likeKey, userIds.toArray());
+//            redisTemplate.opsForValue().set(initKey, 1);
+//            redisTemplate.opsForValue().set(countKey, userIds.size(), 1, TimeUnit.MINUTES);
+//
+//
+//            redisTemplate.expire(likeKey, 1, TimeUnit.MINUTES);
+//            redisTemplate.expire(initKey, 1, TimeUnit.MINUTES);
+//
+//        }
 
     }
 
@@ -160,6 +207,33 @@ public class ArticleLikeServiceImpl implements ArticleLikeService {
         ensureLikeCache(id);
 
         return (Integer) redisTemplate.opsForValue().get(countKey);
+    }
+
+    @Override
+    public Map<Long, Integer> getLikeCountBatch(List<Long> articleIds) {
+        articleIds.forEach(this::ensureLikeCache);
+
+        List<Object> list = redisTemplate.opsForValue().multiGet(
+                articleIds.stream()
+                        .map(id -> COUNT + id)
+                        .collect(Collectors.toList())
+        );
+        log.debug("list={}", list);
+
+        if (list == null || list.isEmpty()) {
+            return Map.of();
+        }
+
+        Map<Long, Integer> map = new HashMap<>();
+        for (int i = 0; i < articleIds.size(); i++) {
+            if (list.get(i) == null) {
+
+                continue;
+            }
+            map.put(articleIds.get(i), Integer.valueOf(list.get(i).toString()));
+        }
+        log.debug("map={}", map);
+        return map;
     }
 
     @Transactional

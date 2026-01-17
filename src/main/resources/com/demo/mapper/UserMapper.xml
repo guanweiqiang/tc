@@ -5,6 +5,8 @@
 <!-- namespace等于mapper接口类的全限定名,这样实现对应 -->
 <mapper namespace="com.demo.mapper.UserMapper">
 
+    
+
     <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
         INSERT INTO `user` (username, `password`, email, nickname)
         VALUES (#{username}, #{password}, #{email}, #{username});
@@ -57,5 +59,35 @@
         SET email = #{email}
         WHERE id = #{id};
     </update>
+
+    <select id="getUsername" resultType="string">
+        SELECT username
+        FROM `user`
+        WHERE id = #{userId};
+    </select>
+
+    <select id="getNickname" resultType="string">
+        SELECT nickname
+        FROM  `user`
+        WHERE id = #{userId};
+    </select>
+
+    <select id="getNicknameBatch" resultType="com.demo.pojo.dto.UserIdNicknameDTO">
+        SELECT id, nickname
+        FROM `user`
+        WHERE id IN
+        <foreach collection="userIds" open="(" item="id" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+    
+    <select id="getUserBatch" resultType="user">
+        SELECT id, username, nickname, avatar_url, email
+        FROM `user`
+        WHERE id IN
+        <foreach collection="userIds" open="(" item="id" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 
 </mapper>

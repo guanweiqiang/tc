@@ -28,7 +28,11 @@ public enum ResponseCode {
 
 
     //elasticsearch
-    ELASTICSEARCH_FAIL(4000, "es搜索失败", false);
+    ELASTICSEARCH_FAIL(4000, "es搜索失败", false),
+
+
+    //comment
+    COMMENT_FAIL(5000, "评论失败", false);
 
 
 

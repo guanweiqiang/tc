@@ -36,6 +36,8 @@ public class MVCConfig implements WebMvcConfigurer {
                 .addPathPatterns("/article/add")
                 .addPathPatterns("/article/like/**")
                 .addPathPatterns("/article/favorite/**")
+                .addPathPatterns("/article/comment/add")
+                .addPathPatterns("/article/comment/reply")
                 .order(1);
 
 

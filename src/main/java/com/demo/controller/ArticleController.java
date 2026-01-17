@@ -4,13 +4,13 @@ import cn.hutool.core.bean.BeanUtil;
 import com.demo.advice.BizLog;
 import com.demo.exception.GlobalException;
 import com.demo.pojo.Article;
-import com.demo.pojo.DTO.ArticleAddDTO;
-import com.demo.pojo.DTO.ArticleSearchListDTO;
-import com.demo.pojo.DTO.ArticleUpdateDTO;
+import com.demo.pojo.dto.ArticleAddDTO;
+import com.demo.pojo.dto.ArticleSearchListDTO;
+import com.demo.pojo.dto.ArticleUpdateDTO;
 import com.demo.pojo.Response;
 import com.demo.pojo.UserContext;
-import com.demo.pojo.VO.ArticleDetailVO;
-import com.demo.pojo.VO.ArticleListVO;
+import com.demo.pojo.vo.ArticleDetailVO;
+import com.demo.pojo.vo.ArticleListVO;
 import com.demo.service.ArticleService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -64,7 +64,7 @@ public class ArticleController {
     }
 
     @GetMapping("detail/{id}")
-    @BizLog("get the detail of article")
+    @BizLog("getRootComment the detail of article")
     public Response<ArticleDetailVO> searchDetail(@PathVariable Long id) {
         return Response.ok(service.searchDetail(id));
     }

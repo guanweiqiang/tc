@@ -25,7 +25,7 @@ spring:
   mail:
     host: smtp.qq.com
     username: 2125205485@qq.com
-    password:
+    password: ${MAIL_PASSWORD}
     port: 465
     ssl:
       enabled: true
@@ -48,3 +48,6 @@ file:
   upload:
     avatar-path: ./data/upload/avatar/
     avatar-url-prefix: /avatar/
+#logging:
+#  level:
+#    com.demo: debug

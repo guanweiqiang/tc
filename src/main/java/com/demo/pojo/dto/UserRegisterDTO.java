@@ -1,4 +1,4 @@
-package com.demo.pojo.DTO;
+package com.demo.pojo.dto;
 
 import lombok.Data;
 

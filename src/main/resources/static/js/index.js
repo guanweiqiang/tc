@@ -1,5 +1,7 @@
+import {initUser} from "./nav-bar.js";
+
 const TOKEN_KEY = "Authorization";
-const API_BASE = "http://192.168.0.101:8080";
+import {API_BASE} from "./config.js";
 
 // 通用请求头处理
 function getHeaders() {
@@ -23,6 +25,7 @@ async function initPage() {
 
         // 获取用户信息填充 UI
         fetchUserInfo();
+        initUser();
     } else {
         // 未登录状态
         loginLink.style.display = "block";
@@ -43,10 +46,6 @@ async function fetchUserInfo() {
 
         if (result.isSuccess) {
             const user = result.data;
-            // 填充头像
-            if (user.avatar) {
-                document.getElementById("userAvatar").src = user.avatar;
-            }
 
             // 填充下拉菜单昵称
             document.getElementById("navNickname").innerText = user.nickname || user.username;
@@ -57,25 +56,6 @@ async function fetchUserInfo() {
         console.error("加载用户信息失败:", error);
     }
 }
-
-// 3. 退出登录逻辑
-document.getElementById("logoutBtn")?.addEventListener("click", async () => {
-    if (!confirm("确定要退出登录吗？")) return;
-
-    try {
-        // 通知后端清理 Session (可选)
-        await fetch(`${API_BASE}/auth/logout`, {
-            method: "POST",
-            headers: getHeaders()
-        });
-    } catch (error) {
-        console.error("登出请求失败:", error);
-    } finally {
-        // 无论如何都要清理本地 Token
-        localStorage.removeItem(TOKEN_KEY);
-        location.href = "login.html";
-    }
-});
 
 
 // 4. 执行初始化

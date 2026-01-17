@@ -8,6 +8,13 @@
     <link rel="stylesheet" href="css/search.css">
     <link rel="stylesheet" href="css/article.css">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* 分页样式补充 */
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 20px; margin: 40px 0; }
+        .page-btn { padding: 10px 20px; border-radius: 8px; border: 1px solid var(--border); background: white; cursor: pointer; transition: 0.3s; }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .page-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+    </style>
 </head>
 <body>
 
@@ -16,13 +23,13 @@
         <div class="nav-left">
             <a href="index.html" class="logo">MyProject</a>
             <nav class="main-nav">
-                <a href="index.html" class="active">首页</a>
-                <a href="article.html">文章列表</a>
+                <a href="index.html">首页</a>
+                <a href="article.html" class="active">文章列表</a>
             </nav>
         </div>
 
         <div class="nav-right">
-            <a href="javascript:void(0)" class="nav-publish-btn" id="publishBtn">
+            <a href="add-article.html" class="nav-publish-btn" id="publishBtn">
                 <i data-lucide="pen-line"></i> <span>写文章</span>
             </a>
 
@@ -30,7 +37,7 @@
 
             <div class="avatar-wrapper" id="avatarWrapper" style="display: none; position: relative; padding: 5px 0;">
                 <div class="avatar-container">
-                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="avatar" id="userAvatar">
+                    <img src="" class="avatar" id="navAvatar">
                 </div>
 
                 <div class="dropdown">
@@ -62,7 +69,7 @@
                         <i data-lucide="search" class="search-icon"></i>
                         <input type="text" id="keyword" placeholder="搜你想看的文章...">
                     </div>
-                    <button class="search-main-btn" onclick="fetchArticles(1)">搜索</button>
+                    <button class="search-main-btn" id="searchBtn">搜索</button>
                 </div>
 
                 <div class="filter-row">
@@ -83,23 +90,29 @@
             </div>
         </section>
 
-        <section class="article-feed" id="articleList" style="width: 100%; margin-top: 40px;">
-        </section>
+        <section class="article-feed" id="articleList" style="width: 100%; margin-top: 40px;"></section>
+
+        <div class="pagination">
+            <button id="prevBtn" class="page-btn" disabled>上一页</button>
+            <span id="pageInfo" style="font-weight: 600; color: var(--text-body);">第 1 页</span>
+            <button id="nextBtn" class="page-btn">下一页</button>
+        </div>
 
     </div>
 
     <div class="modal-overlay" id="articleModal">
         <div class="modal-content">
-            <button class="modal-close" onclick="closeModal()">&times;</button>
-            <div id="modalBody">
-            </div>
+            <button class="modal-close close-btn">&times;</button>
+            <div id="modalBody"></div>
         </div>
     </div>
 </main>
 
-
-<script src="js/nav-bar.js"></script>
-<script src="js/article.js"></script>
-<script>lucide.createIcons();</script>
+<script type="module" src="js/nav-bar.js"></script>
+<script type="module" src="js/article.js"></script>
+<script>
+    // 渲染页面静态图标
+    lucide.createIcons();
+</script>
 </body>
 </html>

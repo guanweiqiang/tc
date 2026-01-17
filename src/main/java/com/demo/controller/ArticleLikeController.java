@@ -17,7 +17,7 @@ public class ArticleLikeController {
 
 
     @GetMapping("{id}")
-    @BizLog("get the count of like")
+    @BizLog("getRootComment the count of like")
     public Response<Integer> getLikeCount(@PathVariable("id") Long id) {
         return Response.ok(service.getLikeCount(id));
     }

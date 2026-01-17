@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace等于mapper接口类的全限定名,这样实现对应 -->
+<mapper namespace="com.demo.mapper.CommentMapper">
+
+
+    <insert id="add">
+        INSERT INTO comment (article_id, user_id, content)
+        VALUES (#{articleId}, #{userId}, #{content});
+    </insert>
+
+    <insert id="reply">
+        INSERT INTO comment (article_id, user_id, root_id, reply_to_id, content)
+        VALUES (#{articleId}, #{userId}, #{rootId}, #{replyToId}, #{content})
+    </insert>
+
+    <select id="getRootComment" resultType="comment">
+        SELECT *
+        FROM comment
+        WHERE article_id = #{articleId}
+        AND root_id IS NULL
+        ORDER BY created_at;
+    </select>
+
+    <select id="getSecondaryComment" resultType="comment">
+        SELECT *
+        FROM comment
+        WHERE root_id = #{rootId}
+        ORDER BY created_at;
+    </select>
+
+    <select id="getSubCommentCount" resultType="int">
+        SELECT COUNT(1)
+        FROM comment
+        WHERE root_id = #{rootId};
+    </select>
+    
+    <select id="getSubCommentCountBatch" resultType="com.demo.pojo.dto.SubCommentCountDTO">
+        SELECT c1.id as id, COUNT(c2.id) as count
+        FROM comment c1
+        LEFT JOIN comment c2 ON c2.root_id = c1.id
+        WHERE c1.id IN
+        <foreach collection="rootIds" open="(" separator="," item="id" close=")">
+            #{id}
+        </foreach>
+        GROUP BY c1.id;
+    </select>
+
+    <select id="getUseOfComment" resultType="long">
+        SELECT user_id
+        FROM comment
+        WHERE comment_id = #{commentId};
+    </select>
+
+    <select id="getUserOfCommentBatch" resultType="com.demo.pojo.dto.CommentUserDTO">
+        SELECT c.id as comment_id, u.id as user_id, nickname, avatar_url
+        FROM comment c
+        LEFT JOIN `user` u ON u.id = c.user_id
+        WHERE c.id IN
+        <foreach collection="commentIds" open="(" separator="," item="id" close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="getCommentCount" resultType="int">
+        SELECT COUNT(1)
+        FROM comment
+        WHERE article_id = #{articleId};
+    </select>
+
+</mapper>

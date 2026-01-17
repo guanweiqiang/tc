@@ -1,6 +1,7 @@
 package com.demo.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface ArticleLikeService {
@@ -18,6 +19,14 @@ public interface ArticleLikeService {
      * @return The count of likes.
      */
     Integer getLikeCount(Long articleId);
+
+    /**
+     * Get the count of like batch.
+     * @param articleIds The id of articles.
+     * @return The map of like count, key is the article id, value is the count.
+     */
+    Map<Long, Integer> getLikeCountBatch(
+            List<Long> articleIds);
 
     /**
      * Batch insert into the table;
