@@ -16,7 +16,6 @@ function getHeaders() {
 async function initPage() {
     const loginLink = document.getElementById("loginLink");
     const avatarWrapper = document.getElementById("avatarWrapper");
-    const welcomeText = document.getElementById("welcomeText");
 
     if (localStorage.getItem(TOKEN_KEY)) {
         // 已登录状态

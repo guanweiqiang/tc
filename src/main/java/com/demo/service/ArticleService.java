@@ -6,7 +6,6 @@ import com.demo.pojo.vo.ArticleDetailVO;
 import com.demo.pojo.vo.ArticleListVO;
 
 import java.util.List;
-import java.util.Map;
 
 public interface ArticleService {
 

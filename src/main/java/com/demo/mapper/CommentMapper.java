@@ -1,15 +1,12 @@
 package com.demo.mapper;
 
 import com.demo.pojo.Comment;
-import com.demo.pojo.User;
 import com.demo.pojo.dto.CommentUserDTO;
 import com.demo.pojo.dto.SubCommentCountDTO;
-import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Mapper

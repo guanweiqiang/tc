@@ -2,7 +2,6 @@ package com.demo.service;
 
 import com.demo.pojo.dto.CommentAddDTO;
 import com.demo.pojo.dto.CommentReplyDTO;
-import com.demo.pojo.User;
 import com.demo.pojo.dto.CommentUserDTO;
 import com.demo.pojo.dto.SubCommentCountDTO;
 import com.demo.pojo.vo.CommentVO;
