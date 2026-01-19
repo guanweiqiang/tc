@@ -52,6 +52,9 @@ function initVerifyBtn() {
 
 async function sendCode() {
     if (isSending) return;
+
+    howError("");
+
     const email = document.getElementById("emailC").value.trim();
 
     if (!/^\S+@\S+\.\S+$/.test(email)) {
@@ -67,6 +70,7 @@ async function sendCode() {
         const data = await response.json();
 
         if (data.isSuccess) {
+            howError("");
             startCountdown();
         } else {
             showError(data.message || "发送失败");
@@ -96,6 +100,7 @@ function startCountdown() {
 }
 
 async function handleLogin(type) {
+    showError("");
     let url = "";
     let payload = {};
 

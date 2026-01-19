@@ -21,7 +21,7 @@ spring:
       database: 0
       password: ${REDIS_PASSWORD}
 
-  #=============mail=============
+  #=============mail=====================
   mail:
     host: smtp.qq.com
     username: 2125205485@qq.com
@@ -29,6 +29,19 @@ spring:
     port: 465
     ssl:
       enabled: true
+  #===============rabbitmq=============
+  rabbitmq:
+    username: admin
+    password: ${RABBITMQ_PASSWORD}
+    virtual-host: /
+    host: localhost
+    port: 5672
+    listener:
+      simple:
+        acknowledge-mode: manual #self to send ack
+        prefetch: 1000  #the count of task consume per second
+    publisher-confirm-type: correlated
+    publisher-returns: true
 
 #==============elasticsearch==========================
 elasticsearch:
@@ -48,6 +61,6 @@ file:
   upload:
     avatar-path: ./data/upload/avatar/
     avatar-url-prefix: /avatar/
-#logging:
-#  level:
-#    com.demo: debug
+logging:
+  level:
+    com.demo: debug
