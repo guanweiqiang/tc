@@ -1,6 +1,5 @@
 package com.demo.service.Impl;
 
-import com.demo.exception.GlobalException;
 import com.demo.exception.auth.VerificationCodeException;
 import com.demo.mq.producer.MailSenderProducer;
 import com.demo.pojo.EmailVerifyPurpose;
@@ -8,16 +7,9 @@ import com.demo.pojo.dto.MailMessageDTO;
 import com.demo.service.EmailVerificationService;
 import com.demo.util.VerificationUtil;
 import jakarta.annotation.Resource;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 
 import java.util.concurrent.TimeUnit;
 
@@ -25,11 +17,6 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class EmailVerificationServiceImpl implements EmailVerificationService {
 
-    @Resource
-    private JavaMailSender mailSender;
-
-    @Resource
-    private TemplateEngine templateEngine;
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;

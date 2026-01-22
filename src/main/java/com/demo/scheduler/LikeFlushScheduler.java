@@ -67,11 +67,7 @@ public class LikeFlushScheduler {
             }
 
         }
-
         scan.close();
-
-
         setOps.getOperations().delete(frozenUpdate);
-
     }
 }

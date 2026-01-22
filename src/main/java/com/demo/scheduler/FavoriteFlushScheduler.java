@@ -29,6 +29,7 @@ public class FavoriteFlushScheduler {
     private RedisLuaScriptManager scriptManager;
 
 
+    //todo: use rabbitmq to flush db
     @Scheduled(fixedDelay = 5000)
     public void flushLike() {
 
