@@ -2,16 +2,16 @@ package com.demo.service.Impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.demo.config.FileUploadProperties;
-import com.demo.exception.comment.CommentFailException;
+import com.demo.common.exception.comment.CommentFailException;
 import com.demo.mapper.CommentMapper;
 import com.demo.pojo.Comment;
-import com.demo.pojo.dto.CommentAddDTO;
-import com.demo.pojo.dto.CommentReplyDTO;
+import com.demo.model.dto.CommentAddDTO;
+import com.demo.model.dto.CommentReplyDTO;
 import com.demo.pojo.User;
 import com.demo.pojo.UserContext;
-import com.demo.pojo.dto.CommentUserDTO;
-import com.demo.pojo.dto.SubCommentCountDTO;
-import com.demo.pojo.vo.CommentVO;
+import com.demo.model.dto.CommentUserDTO;
+import com.demo.model.dto.SubCommentCountDTO;
+import com.demo.model.vo.CommentVO;
 import com.demo.service.CommentService;
 import com.demo.service.UserService;
 import jakarta.annotation.Resource;
@@ -36,8 +36,6 @@ public class CommentServiceImpl implements CommentService {
     @Resource
     private UserService userService;
 
-    @Resource
-    private FileUploadProperties properties;
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
@@ -54,6 +52,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setUserId(userId);
 
         int add = mapper.add(comment);
+
         if (add != 1) {
             log.error("文章id={}，userId={}添加评论失败",
                     comment.getArticleId(),
@@ -63,6 +62,9 @@ public class CommentServiceImpl implements CommentService {
         log.info("文章id={}，userId={}成功添加评论",
                 comment.getArticleId(),
                 comment.getUserId());
+
+        String countKey = COUNT + commentAddDTO.getArticleId();
+        redisTemplate.opsForValue().increment(countKey);
     }
 
     @Override
@@ -74,6 +76,8 @@ public class CommentServiceImpl implements CommentService {
         comment.setUserId(userId);
 
         int reply = mapper.reply(comment);
+
+
         if (reply != 1) {
             log.error("一级评论id={}，userId={}回复评论id={}失败",
                     comment.getRootId(),
@@ -85,6 +89,9 @@ public class CommentServiceImpl implements CommentService {
                 comment.getRootId(),
                 comment.getUserId(),
                 comment.getReplyToId());
+
+        String countKey = COUNT + commentReplyDTO.getArticleId();
+        redisTemplate.opsForValue().increment(countKey);
     }
 
     @Override

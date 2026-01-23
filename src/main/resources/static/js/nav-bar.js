@@ -40,8 +40,21 @@ export function initUser() {
     if (logoutBtn) {
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
+            const token = localStorage.getItem(TOKEN_KEY);
+
             if (confirm("确定要退出登录吗？")) {
-                localStorage.removeItem(TOKEN_KEY);
+
+                try {
+                    localStorage.removeItem(TOKEN_KEY);
+                    const res = fetch(`${API_BASE}/auth/logout`, {
+                        method: 'POST',
+                        TOKEN_KEY: token
+                    })
+                } catch (err) {
+                    console.log('退出登录失败，请重新退出')
+                }
+
+
                 // 也可以清除其他用户信息缓存
                 window.location.href = "index.html";
             }
@@ -54,6 +67,8 @@ export function initUser() {
  */
 async function updateNavUserInfo() {
     const token = localStorage.getItem(TOKEN_KEY);
+    const loginLink = document.getElementById('loginLink');
+    const avatarWrapper = document.getElementById('avatarWrapper');
     try {
         const res = await fetch(`${API_BASE}/user/profile`, { // 替换为你的真实路径
             headers: { "Authorization": token }
@@ -66,6 +81,9 @@ async function updateNavUserInfo() {
             if (navAvatar && result.data.avatar) navAvatar.src = result.data.avatar;
         }
     } catch (err) {
+
+        loginLink.style.display = 'block';
+        avatarWrapper.style.display = 'none';
         console.error("更新导航栏用户信息失败", err);
     }
 }

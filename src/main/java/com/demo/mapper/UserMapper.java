@@ -2,7 +2,7 @@ package com.demo.mapper;
 
 
 import com.demo.pojo.User;
-import com.demo.pojo.dto.UserIdNicknameDTO;
+import com.demo.model.dto.UserIdNicknameDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

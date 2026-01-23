@@ -1,10 +1,10 @@
 package com.demo.service;
 
-import com.demo.pojo.dto.CommentAddDTO;
-import com.demo.pojo.dto.CommentReplyDTO;
-import com.demo.pojo.dto.CommentUserDTO;
-import com.demo.pojo.dto.SubCommentCountDTO;
-import com.demo.pojo.vo.CommentVO;
+import com.demo.model.dto.CommentAddDTO;
+import com.demo.model.dto.CommentReplyDTO;
+import com.demo.model.dto.CommentUserDTO;
+import com.demo.model.dto.SubCommentCountDTO;
+import com.demo.model.vo.CommentVO;
 
 import java.util.List;
 import java.util.Map;

@@ -1,11 +1,11 @@
 package com.demo.service.Impl;
 
-import com.demo.exception.auth.VerificationCodeException;
+import com.demo.common.exception.auth.VerificationCodeException;
 import com.demo.mq.producer.MailSenderProducer;
 import com.demo.pojo.EmailVerifyPurpose;
-import com.demo.pojo.dto.MailMessageDTO;
+import com.demo.model.dto.MailMessageDTO;
 import com.demo.service.EmailVerificationService;
-import com.demo.util.VerificationUtil;
+import com.demo.common.util.VerificationUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;

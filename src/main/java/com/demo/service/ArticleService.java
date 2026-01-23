@@ -1,9 +1,9 @@
 package com.demo.service;
 
 import com.demo.pojo.Article;
-import com.demo.pojo.dto.ArticleSearchListDTO;
-import com.demo.pojo.vo.ArticleDetailVO;
-import com.demo.pojo.vo.ArticleListVO;
+import com.demo.model.dto.ArticleSearchListDTO;
+import com.demo.model.vo.ArticleDetailVO;
+import com.demo.model.vo.ArticleListVO;
 
 import java.util.List;
 

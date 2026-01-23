@@ -1,6 +1,6 @@
 package com.demo.pojo;
 
-import com.demo.util.TimeUtil;
+import com.demo.common.util.TimeUtil;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -51,11 +51,15 @@ public class Response<T> {
     }
 
     public static <A> Response<A> error(A data) {
-        return new Response<>(ResponseCode.VALIDATION_ERROR, data);
+        return new Response<>(ResponseCode.INTERNAL_ERROR, data);
     }
 
     public static <A> Response<A> error(ResponseCode code, A data) {
         return new Response<>(code, data);
+    }
+
+    public static <A> Response<A> error(ResponseCode code, String msg) {
+        return error(code.getCode(), msg);
     }
 
     public static <A> Response<A> error(Integer code, String message) {

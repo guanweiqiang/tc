@@ -1,11 +1,11 @@
 package com.demo.service;
 
-import com.demo.pojo.dto.EmailCodeLoginDTO;
-import com.demo.pojo.dto.EmailPwdLoginDTO;
-import com.demo.pojo.dto.LoginDTO;
-import com.demo.pojo.dto.UserRegisterDTO;
+import com.demo.model.dto.EmailCodeLoginDTO;
+import com.demo.model.dto.EmailPwdLoginDTO;
+import com.demo.model.dto.LoginDTO;
+import com.demo.model.dto.UserRegisterDTO;
 import com.demo.pojo.EmailVerifyPurpose;
-import com.demo.pojo.vo.UserLoginVO;
+import com.demo.model.vo.UserLoginVO;
 import jakarta.mail.MessagingException;
 
 public interface AuthService {

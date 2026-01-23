@@ -1,8 +1,8 @@
 package com.demo.mapper;
 
 import com.demo.pojo.Comment;
-import com.demo.pojo.dto.CommentUserDTO;
-import com.demo.pojo.dto.SubCommentCountDTO;
+import com.demo.model.dto.CommentUserDTO;
+import com.demo.model.dto.SubCommentCountDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

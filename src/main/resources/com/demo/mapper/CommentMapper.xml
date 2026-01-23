@@ -37,7 +37,7 @@
         WHERE root_id = #{rootId};
     </select>
     
-    <select id="getSubCommentCountBatch" resultType="com.demo.pojo.dto.SubCommentCountDTO">
+    <select id="getSubCommentCountBatch" resultType="com.demo.model.dto.SubCommentCountDTO">
         SELECT c1.id as id, COUNT(c2.id) as count
         FROM comment c1
         LEFT JOIN comment c2 ON c2.root_id = c1.id
@@ -54,7 +54,7 @@
         WHERE comment_id = #{commentId};
     </select>
 
-    <select id="getUserOfCommentBatch" resultType="com.demo.pojo.dto.CommentUserDTO">
+    <select id="getUserOfCommentBatch" resultType="com.demo.model.dto.CommentUserDTO">
         SELECT c.id as comment_id, u.id as user_id, nickname, avatar_url
         FROM comment c
         LEFT JOIN `user` u ON u.id = c.user_id

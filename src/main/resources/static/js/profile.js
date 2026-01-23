@@ -46,13 +46,7 @@ function initEventListeners() {
     document.getElementById('btnSavePwd').addEventListener('click', savePwd);
 
     // 6. 密码可见性切换
-    document.querySelectorAll('.toggle-pwd').forEach(icon => {
-        icon.addEventListener('click', () => {
-            const targetId = icon.getAttribute('data-target');
-            const input = document.getElementById(targetId);
-            input.type = input.type === 'password' ? 'text' : 'password';
-        });
-    });
+    initPasswordToggle();
 }
 
 // --- 核心业务逻辑 ---
@@ -154,6 +148,36 @@ async function verifyOldEmail() {
     } else {
         showTip('emailMsg', result.message, false);
     }
+}
+
+
+// 4. 初始化密码可见性切换
+function initPasswordToggle() {
+    // 使用事件委托，监听所有的眼睛图标
+    document.addEventListener('click', (e) => {
+        const toggleBtn = e.target.closest('.toggle-pwd');
+        if (!toggleBtn) return;
+
+        // 获取目标输入框 ID
+        const targetId = toggleBtn.getAttribute('data-target');
+        const pwdInput = document.getElementById(targetId);
+
+        if (pwdInput) {
+            // 1. 切换输入框类型
+            const isPassword = pwdInput.type === 'password';
+            pwdInput.type = isPassword ? 'text' : 'password';
+
+            // 2. 切换图标 (Lucide 图标需要重新创建)
+            const iconName = isPassword ? 'eye-off' : 'eye';
+            toggleBtn.setAttribute('data-lucide', iconName);
+
+            // 3. 重新渲染图标颜色和样式（可选）
+            toggleBtn.style.color = isPassword ? 'var(--primary)' : '#999';
+
+            // 关键：Lucide 必须重新运行以替换 DOM 中的图标
+            lucide.createIcons();
+        }
+    });
 }
 
 async function sendNewEmailCode() {

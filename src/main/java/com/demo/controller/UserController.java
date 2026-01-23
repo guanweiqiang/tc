@@ -3,15 +3,16 @@ package com.demo.controller;
 
 import com.demo.advice.BizLog;
 import com.demo.config.FileUploadProperties;
-import com.demo.pojo.dto.UpdateEmailDTO;
-import com.demo.pojo.dto.UpdateNicknameDTO;
-import com.demo.pojo.dto.UserUpdatePasswordDTO;
-import com.demo.pojo.dto.VerifyOldEmailDTO;
+import com.demo.model.dto.UpdateEmailDTO;
+import com.demo.model.dto.UpdateNicknameDTO;
+import com.demo.model.dto.UserUpdatePasswordDTO;
+import com.demo.model.dto.VerifyOldEmailDTO;
 import com.demo.pojo.Response;
 import com.demo.pojo.UserContext;
-import com.demo.pojo.vo.UserProfileVO;
+import com.demo.model.vo.UserProfileVO;
 import com.demo.service.UserService;
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,7 +41,7 @@ public class UserController {
 
     @PutMapping("changePassword")
     @BizLog("update password")
-    public Response<Void> updatePassword(@RequestBody UserUpdatePasswordDTO dto) {
+    public Response<Void> updatePassword(@Valid @RequestBody UserUpdatePasswordDTO dto) {
         Long userId = UserContext.get();
         service.updatePassword(userId, dto.getOldPassword(), dto.getNewPassword());
         return Response.ok();
@@ -75,7 +76,7 @@ public class UserController {
 
     @PostMapping("updateNickname")
     @BizLog("update nickname")
-    public Response<Void> updateNickname(@RequestBody UpdateNicknameDTO updateNicknameDTO) {
+    public Response<Void> updateNickname(@Valid @RequestBody UpdateNicknameDTO updateNicknameDTO) {
         Long userId = UserContext.get();
         service.updateNickname(userId, updateNicknameDTO.getNickname());
         return Response.ok();
@@ -83,7 +84,7 @@ public class UserController {
 
     @PostMapping("verifyOldEmail")
     @BizLog("verify old email when update email")
-    public Response<String> verifyOldEmail(@RequestBody VerifyOldEmailDTO verifyOldEmailDTO) {
+    public Response<String> verifyOldEmail(@Valid @RequestBody VerifyOldEmailDTO verifyOldEmailDTO) {
         String ticket = service.verifyOldEmail(verifyOldEmailDTO);
         return Response.ok(ticket);
     }
@@ -91,7 +92,7 @@ public class UserController {
 
     @PostMapping("updateEmail")
     @BizLog("update email")
-    public Response<Void> updateEmail(@RequestBody UpdateEmailDTO updateEmailDTO) {
+    public Response<Void> updateEmail(@Valid @RequestBody UpdateEmailDTO updateEmailDTO) {
         service.updateEmail(updateEmailDTO);
         return Response.ok();
     }

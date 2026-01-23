@@ -1,9 +1,9 @@
 package com.demo.mq.consumer;
 
 import com.demo.config.MailMQConfig;
-import com.demo.exception.GlobalException;
+import com.demo.common.exception.GlobalException;
 import com.demo.pojo.EmailVerifyPurpose;
-import com.demo.pojo.dto.MailMessageDTO;
+import com.demo.model.dto.MailMessageDTO;
 import com.rabbitmq.client.Channel;
 import jakarta.annotation.Resource;
 import jakarta.mail.MessagingException;

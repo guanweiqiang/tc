@@ -1,14 +1,11 @@
 package com.demo.interceptor;
 
 
-import com.demo.exception.user.JWTTokenException;
-import com.demo.exception.user.LoginException;
+import com.demo.common.util.JWTUtil;
 import com.demo.pojo.UserContext;
-import com.demo.util.JWTUtil;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;

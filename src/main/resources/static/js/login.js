@@ -53,7 +53,7 @@ function initVerifyBtn() {
 async function sendCode() {
     if (isSending) return;
 
-    howError("");
+    showError("");
 
     const email = document.getElementById("emailC").value.trim();
 
@@ -70,7 +70,7 @@ async function sendCode() {
         const data = await response.json();
 
         if (data.isSuccess) {
-            howError("");
+            showError("");
             startCountdown();
         } else {
             showError(data.message || "发送失败");

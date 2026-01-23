@@ -220,3 +220,10 @@ input {
         gap: 12px;
     }
 }
+
+.toggle-pwd {
+    width: 18px;
+    height: 18px;
+    transition: color 0.2s ease;
+    z-index: 10; /* 确保图标在输入框之上 */
+}

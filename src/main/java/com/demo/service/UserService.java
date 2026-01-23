@@ -1,10 +1,10 @@
 package com.demo.service;
 
 
-import com.demo.pojo.dto.UpdateEmailDTO;
-import com.demo.pojo.dto.VerifyOldEmailDTO;
+import com.demo.model.dto.UpdateEmailDTO;
+import com.demo.model.dto.VerifyOldEmailDTO;
 import com.demo.pojo.User;
-import com.demo.pojo.vo.UserProfileVO;
+import com.demo.model.vo.UserProfileVO;
 
 import java.util.Map;
 import java.util.Set;

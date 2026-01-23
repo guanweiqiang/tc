@@ -1,8 +1,7 @@
 package com.demo.mq.producer;
 
 import com.demo.config.MailMQConfig;
-import com.demo.mq.consumer.MailSenderConsumer;
-import com.demo.pojo.dto.MailMessageDTO;
+import com.demo.model.dto.MailMessageDTO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;

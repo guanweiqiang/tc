@@ -72,7 +72,7 @@
         WHERE id = #{userId};
     </select>
 
-    <select id="getNicknameBatch" resultType="com.demo.pojo.dto.UserIdNicknameDTO">
+    <select id="getNicknameBatch" resultType="com.demo.model.dto.UserIdNicknameDTO">
         SELECT id, nickname
         FROM `user`
         WHERE id IN

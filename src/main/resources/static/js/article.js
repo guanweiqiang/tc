@@ -292,13 +292,17 @@ function openReplyInput(articleId, rootId, replyToId, targetName, btnElement) {
     replyBox.querySelector('input').focus();
 }
 
+
 async function submitComment(articleId, rootId, replyToId, btn) {
     const token = localStorage.getItem("Authorization");
     if (!token) return showActionTip(btn, "请先登录");
 
-    const container = btn.parentElement;
-    const input = container.querySelector('input');
-    const content = input.value.trim();
+    // --- 修改点：更精准地定位 input ---
+    // 不管按钮套了多少层，都在它所属的那个大容器（评论区或回复框）里找 input
+    const box = btn.closest('.quick-reply-bar') || btn.closest('.temp-reply-box');
+    const input = box?.querySelector('input');
+
+    const content = input?.value.trim();
     if (!content) return showActionTip(btn, "内容不能为空");
 
     btn.disabled = true;
@@ -319,7 +323,7 @@ async function submitComment(articleId, rootId, replyToId, btn) {
             showActionTip(btn, "发送成功");
             input.value = "";
 
-            // --- 核心刷新逻辑 ---
+            // --- 刷新逻辑 ---
             const articleItem = btn.closest('.article-item');
             const commentBox = articleItem.querySelector('.comment-section');
 
@@ -329,13 +333,16 @@ async function submitComment(articleId, rootId, replyToId, btn) {
                 const subContainer = document.getElementById(`sub-container-${rootId}`);
                 if (subContainer) {
                     subContainer.innerHTML = "";
-                    // 找到对应的“查看回复”按钮
                     const viewBtn = subContainer.parentElement.querySelector('.view-sub-btn');
-                    // 重新获取数据，fetchSubComments 内部现在会自动更新按钮上的数字
                     await fetchSubComments(rootId, viewBtn);
                 }
-                if (container.classList.contains('temp-reply-box')) container.remove();
+                // --- 修改点：这里使用 box 变量来移除临时回复框 ---
+                if (box && box.classList.contains('temp-reply-box')) {
+                    setTimeout(() => box.remove(), 500);
+                }
             }
+        } else {
+            showError?.(result.message) || showActionTip(btn, result.message);
         }
     } catch (err) {
         showActionTip(btn, "网络异常");
